@@ -40,19 +40,29 @@ class Sticker extends SimuSticker{
 class Tag extends Sticker{
  float startX,
        startY;
+ Config conf;
       
-  Tag(Config conf, int sup){
-    super(sup, conf.Tpixels, conf.THpixels, conf.tagMarkerColor,conf.steps2Pixels);
-    if (sup !=3){
-      startX = conf.baseX + conf.tagBaseLeftOffset + conf.rampBaseLength + conf.rampSlopeLength*cos(conf.rampSlopeAngle);
-      startY = conf.baseY -conf.rampHeight - conf.rampSlopeLength*sin(conf.rampSlopeAngle);
+  Tag(Config c, int sup){
+    super(sup, c.Tpixels, c.THpixels, c.tagMarkerColor,c.steps2Pixels);
+    conf = c;;
+    if (support !=3){
+      startX = conf.baseX -conf.Tpixels + conf.tagBaseLeftOffset + conf.rampBaseLength + conf.rampSlopeLength*cos(conf.rampSlopeAngle);
+      startY = conf.baseY -conf.Tpixels -conf.rampHeight - conf.rampSlopeLength*sin(conf.rampSlopeAngle);
     }
     else{
-      startX = conf.baseX + conf.tagBaseLeftOffset + conf.rampBaseLength;
+      startX = conf.baseX + conf.tagBaseLeftOffset + conf.rampBaseLength + conf.rampHeight;
       startY = conf.baseY;
     }
   }
   void doStep(){
+    if (support !=3){
+      startX = conf.baseX -conf.Tpixels + conf.tagBaseLeftOffset + conf.rampBaseLength + conf.rampSlopeLength*cos(conf.rampSlopeAngle);
+      startY = conf.baseY -conf.Tpixels -conf.rampHeight - conf.rampSlopeLength*sin(conf.rampSlopeAngle);
+    }
+    else{
+      startX = conf.baseX + conf.tagBaseLeftOffset + conf.rampBaseLength -conf.Tpixels + conf.rampHeight;
+      startY = conf.baseY;
+    }
     pushMatrix();
     translate(startX,startY);
     step();
@@ -64,19 +74,29 @@ class Tag extends Sticker{
 class Label extends Sticker{
   float startX,
         startY;
-      
-  Label(Config conf,int sup){
-    super(sup, conf.Lpixels, conf.LHpixels, conf.labelMarkerColor,conf.steps2Pixels);
-    if (sup !=3){
-      startX = conf.baseX + conf.labelBaseLeftOffset + conf.rampBaseLength + conf.rampSlopeLength*cos(conf.rampSlopeAngle);
-      startY = conf.baseY -conf.rampHeight - conf.rampSlopeLength*sin(conf.rampSlopeAngle);
+ Config conf;
+ 
+  Label(Config c,int supp){
+    super(supp, c.Lpixels, c.LHpixels, c.labelMarkerColor,c.steps2Pixels);
+    conf = c;
+    if (support !=3){
+      startX = conf.baseX -conf.Lpixels + conf.labelBaseLeftOffset + conf.rampBaseLength + conf.rampSlopeLength*cos(conf.rampSlopeAngle);
+      startY = conf.baseY -conf.Lpixels -conf.rampHeight - conf.rampSlopeLength*sin(conf.rampSlopeAngle);
     }
     else{
-      startX = conf.baseX + conf.labelBaseLeftOffset + conf.rampBaseLength;
+      startX = conf.baseX  -conf.Lpixels + conf.labelBaseLeftOffset + conf.rampBaseLength + conf.rampHeight;
       startY = conf.baseY;
     }
   }
   void doStep(){
+    if (support !=3){
+      startX = conf.baseX -conf.Lpixels + conf.labelBaseLeftOffset + conf.rampBaseLength + conf.rampSlopeLength*cos(conf.rampSlopeAngle);
+      startY = conf.baseY -conf.Lpixels -conf.rampHeight - conf.rampSlopeLength*sin(conf.rampSlopeAngle);
+    }
+    else{
+      startX = conf.baseX  -conf.Lpixels + conf.labelBaseLeftOffset + conf.rampBaseLength + conf.rampHeight;
+      startY = conf.baseY;
+    }
     pushMatrix();
     translate(startX,startY);
     step();
