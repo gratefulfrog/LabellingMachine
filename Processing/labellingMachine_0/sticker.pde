@@ -45,22 +45,15 @@ class Tag extends Sticker{
   Tag(Config c, int sup){
     super(sup, c.Tpixels, c.THpixels, c.tagMarkerColor,c.steps2Pixels);
     conf = c;;
-    if (support !=3){
-      startX = conf.baseX -conf.Tpixels + conf.tagBaseLeftOffset + conf.rampBaseLength + conf.rampSlopeLength*cos(conf.rampSlopeAngle);
-      startY = conf.baseY -conf.Tpixels -conf.rampHeight - conf.rampSlopeLength*sin(conf.rampSlopeAngle);
-    }
-    else{
-      startX = conf.baseX + conf.tagBaseLeftOffset + conf.rampBaseLength + conf.rampHeight;
-      startY = conf.baseY;
-    }
+    
   }
   void doStep(){
     if (support !=3){
-      startX = conf.baseX -conf.Tpixels + conf.tagBaseLeftOffset + conf.rampBaseLength + conf.rampSlopeLength*cos(conf.rampSlopeAngle);
-      startY = conf.baseY -conf.Tpixels -conf.rampHeight - conf.rampSlopeLength*sin(conf.rampSlopeAngle);
+      startX = conf.baseX  + conf.tagBaseLeftOffset + conf.rampBaseLength + (conf.Tpixels +conf.DPTpixels)*cos(conf.rampSlopeAngle);
+      startY = conf.baseY -conf.rampHeight - (conf.Tpixels +conf.DPTpixels)*sin(conf.rampSlopeAngle);
     }
     else{
-      startX = conf.baseX + conf.tagBaseLeftOffset + conf.rampBaseLength -conf.Tpixels + conf.rampHeight;
+      startX = conf.baseX -conf.Tpixels + conf.tagBaseLeftOffset + conf.rampBaseLength  + conf.rampHeight;
       startY = conf.baseY;
     }
     pushMatrix();
@@ -79,20 +72,17 @@ class Label extends Sticker{
   Label(Config c,int supp){
     super(supp, c.Lpixels, c.LHpixels, c.labelMarkerColor,c.steps2Pixels);
     conf = c;
-    if (support !=3){
-      startX = conf.baseX -conf.Lpixels + conf.labelBaseLeftOffset + conf.rampBaseLength + conf.rampSlopeLength*cos(conf.rampSlopeAngle);
-      startY = conf.baseY -conf.Lpixels -conf.rampHeight - conf.rampSlopeLength*sin(conf.rampSlopeAngle);
-    }
-    else{
-      startX = conf.baseX  -conf.Lpixels + conf.labelBaseLeftOffset + conf.rampBaseLength + conf.rampHeight;
-      startY = conf.baseY;
-    }
+
   }
   void doStep(){
     if (support !=3){
+      /*
       startX = conf.baseX -conf.Lpixels + conf.labelBaseLeftOffset + conf.rampBaseLength + conf.rampSlopeLength*cos(conf.rampSlopeAngle);
       startY = conf.baseY -conf.Lpixels -conf.rampHeight - conf.rampSlopeLength*sin(conf.rampSlopeAngle);
-    }
+      */
+      startX = conf.baseX + conf.labelBaseLeftOffset + conf.rampBaseLength + (conf.Lpixels +conf.DPLpixels)*cos(conf.rampSlopeAngle);
+      startY = conf.baseY -conf.rampHeight - (conf.Lpixels +conf.DPLpixels)*sin(conf.rampSlopeAngle);
+  }
     else{
       startX = conf.baseX  -conf.Lpixels + conf.labelBaseLeftOffset + conf.rampBaseLength + conf.rampHeight;
       startY = conf.baseY;

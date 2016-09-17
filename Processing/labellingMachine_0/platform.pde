@@ -19,12 +19,16 @@ class Platform {
     
     String s0 = "T0",
            s1 = "T1";
-    
+    float DPpixels = conf.DPTpixels,
+          Spixels  = conf.Tpixels;
+          
     if (isLabeller){
       fill(conf.labelMarkerColor);
       stroke(conf.labelMarkerColor);  
       s0 = "L0";
       s1= "L1";
+      DPpixels = conf.DPLpixels;
+      Spixels  = conf.Lpixels;
     }
     else{
       stroke(conf.tagMarkerColor);
@@ -44,8 +48,8 @@ class Platform {
     text(s1,x2, y2);
     
     // T0
-          x1 = x1 - cos(45*3.14159/180.0)*(conf.DPTpixels + conf.Tpixels);
-          y1 = -sin(45*3.14159/180.0)*(conf.DPTpixels + conf.Tpixels);
+          x1 = x1 - cos(45*3.14159/180.0)*(DPpixels + Spixels);
+          y1 = -sin(45*3.14159/180.0)*(DPpixels + Spixels);
           x2 = x1 + offset;
           y2 = y1 - offset;
     line (x1,
