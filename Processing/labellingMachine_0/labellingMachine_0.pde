@@ -2,25 +2,27 @@
 final Config config = new Config();
 Platform platform   = new Platform(config);
 
-Boolean CALLOUT = false;
+SyncLock s = new SyncLock();
 
-final int tagDelay = 250,
-          labelDelay = 350;
+Boolean CALLOUT =   true; //false;
 
-Tag   tag1           = new Tag(config,3),
-      tag2           = new Tag(config,3),
-      tag3           = new Tag(config,3);
+final int tagDelay = config.ITsteps,
+          labelDelay = config.ILLsteps;
+
+Tag   tag1           = new Tag(config,3,s),
+      tag2           = new Tag(config,3,s),
+      tag3           = new Tag(config,3,s);
 
 
-Label label1         = new Label(config,3),
-      label2         = new Label(config,3),
-      label3         = new Label(config,3);
+Label label1         = new Label(config,3,s),
+      label2         = new Label(config,3,s),
+      label3         = new Label(config,3,s);
 
 
 //*/
-final int nbTags =7;
+final int nbTags =20;
 Tag tVec[];
-final int nbLabels =7;
+final int nbLabels =8;
 Label lVec[];
 
 /*
@@ -36,16 +38,42 @@ void setup(){
   //tVec[0] = tag1;
   //tVec[1] = tag2;
   for (int i = 0; i< nbTags;i++){
-    tVec[i] =  new Tag(config,1);
-    tVec[i].nbSteps =-tagDelay *(i+1);
+    tVec[i] =  new Tag(config,1,s);
+    tVec[i].nbSteps = -(tagDelay +config.Tsteps)*(i+1);
   }
   int lbaseSteps =  config.LB0steps-1;
   lVec = new Label[nbLabels];
   for (int i = 0; i< nbLabels;i++){
-    lVec[i] =  new Label(config,2);
-    lVec[i].nbSteps = -labelDelay *(i+1);// + lbaseSteps;
+    lVec[i] =  new Label(config,2,s);
+    lVec[i].nbSteps = -(labelDelay+config.Lsteps) *(i+1);// + lbaseSteps;
   }
+  /*
+  String ss = binary(s.syncBits);
+  int ll = ss.length();
+  println(ss.substring(ll-2,ll));
+  s.sync(0,false);
+  ss = binary(s.syncBits);
+  println(ss.substring(ll-2,ll));
+  s.sync(0,true);
+  ss = binary(s.syncBits);
+  println(ss.substring(ll-2,ll));
+  s.sync(0,false);
+  ss = binary(s.syncBits);
+  println(ss.substring(ll-2,ll));
   
+  s.sync(1,false);
+  ss = binary(s.syncBits);
+  println(ss.substring(ll-2,ll));
+  s.sync(1,true);
+  ss = binary(s.syncBits);
+  println(ss.substring(ll-2,ll));
+  s.sync(1,true);
+  ss = binary(s.syncBits);
+  println(ss.substring(ll-2,ll));
+  s.sync(0,true);
+  ss = binary(s.syncBits);
+  println(ss.substring(ll-2,ll));
+  */
   //println(config.TB0pixels - config.T1pixels);
   //println(config.LB0pixels - config.L1pixels);
   
@@ -91,24 +119,18 @@ void setup(){
 }
 
 Tag updateTag(Tag t){
-   if (t.support == 3 && t.nbSteps>tagDelay*(nbTags-1)){
-    t = new Tag(config,1);
-    t.nbSteps = -250;
-  }
-  else if (t.support == 1 && t.nbSteps>config.TB0steps){
-    t.support = 3;// = new Tag(config,1);
-    //t.nbSteps = 0;
+  int nbTagsOnBacker = 15;
+   if (t.support == 3 && t.nbSteps>(tagDelay+config.Tsteps)*(nbTagsOnBacker)){
+    t = new Tag(config,1,s);
+    t.nbSteps = -(tagDelay+config.Tsteps)*(nbTags-nbTagsOnBacker);
   }
   return t;
 }
 Label updateLabel(Label l){
-   if (l.support == 3 && l.nbSteps>labelDelay*(nbLabels-1)){
-    l = new Label(config,2);
-    l.nbSteps = -350;
-  }
-  else if (l.support == 2 && l.nbSteps>config.LB0steps){
-    l.support = 3;// = new Tag(config,1);
-    //l.nbSteps = 0;
+  int nbLabelsOnBacker = 5;
+   if (l.support == 3 && l.nbSteps>(labelDelay+config.Lsteps)*(nbLabelsOnBacker)){
+    l = new Label(config,2,s);
+    l.nbSteps = -(labelDelay+config.Lsteps)*(nbLabels-nbLabelsOnBacker);
   }
   return l;
 }
@@ -151,13 +173,35 @@ void doTagCallouts(){
       doStop();
     }
   }
+  for( int i=0;i<nbLabels;i++){
+    if (lVec[i].nbSteps == config.L0steps){
+      println("AT L0!");
+      doStop();
+    }
+    else if (lVec[i].nbSteps == config.L1steps){
+      println("AT L1!");
+      doStop();
+    }
+    else if (lVec[i].nbSteps == config.LB0steps){
+      println("AT LB0!");
+      doStop();
+    }
+    else if (lVec[i].nbSteps == config.LBsteps){
+      println("AT LB!");
+      doStop();
+    }
+    else if (lVec[i].nbSteps == config.LClearsteps){
+      println("AT LClear!");
+      doStop();
+    }
+  }
 }
 
 void draw(){
   background(0);
   platform.draw();
   
-  good2Label = good2Label || (tVec[0].support == 3 && tVec[0].nbSteps > (config.TNsteps- labelDelay-20)); //- config.LB0steps));
+  good2Label = good2Label || (tVec[0].support == 3 && tVec[0].nbSteps > (config.TNsteps- labelDelay -config.Lsteps -20)); //- config.LB0steps));
   if (good2Label){
   for (int i = 0; i< nbLabels;i++){
     lVec[i].doStep();

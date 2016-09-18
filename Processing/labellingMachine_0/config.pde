@@ -5,7 +5,7 @@ class Config{
   final int windowWidth  = 1800,
             windowHeight = 300;
   
-  final int frameRate = 200;
+  final int frameRate =200;
 
   // conversion factors
   final float mm2Pixels = windowWidth/900.0;  // 2.0 so 10mm = 20 pixels
@@ -21,18 +21,19 @@ class Config{
             IT  = 25,
             ITe = 0,  // no error yet!
             L   = 100,
-            ILL = 15,
+            ILL = 5,
             ILLe = 0, // no error yet!
             DPT = 5,
-            DPL = 8,
+            DPL = 3,
             DS  = 300,
             RH  = 2,
             IL  = 5;
-  final float RA    = PI- QUARTER_PI,
+  final float RA    = PI*(180-21)/180.0, //PI- QUARTER_PI,
               sinRA = sin(RA),
               cosRA = cos(RA),
               tanRA = tan(RA),
-              DA    = RH/sinRA;
+              DA    = RH/sinRA,
+              RX    = RH/tanRA;
             
   // derived values
   final int BIT    = IL +L,
@@ -62,6 +63,7 @@ class Config{
             DPLsteps = (DPL  * mm2Steps),
             DSsteps  = (DS   * mm2Steps),
             RHsteps  = (RH   * mm2Steps),
+            RXsteps  = round(RX   * mm2Steps),
             ILsteps  = (IL   * mm2Steps);
   
             
@@ -123,6 +125,7 @@ class Config{
             DPLpixels = (DPL  * mm2Pixels),
             DSpixels  = (DS   * mm2Pixels),
             RHpixels  = (RH   * mm2Pixels),
+            RXpixels  = (RX   * mm2Pixels),
             ILpixels  = (IL   * mm2Pixels);
             
   final float DApixels = DA * mm2Pixels;

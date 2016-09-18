@@ -38,12 +38,13 @@ class Platform {
       fill(conf.tagMarkerColor);
     }
     float markerLength = 2 * conf.markerLength,
-          offset = markerLength * sin(3.14159*45/180);
+          offsetX = markerLength * cos(conf.RA-PI/2.0),
+          offsetY = markerLength * sin(conf.RA-PI/2.0); //(3.14159*45/180);
     // T1
     float x1 = conf.rampBaseLength,
           y1 = 0,
-          x2 = x1 + offset,
-          y2 = y1 - offset;
+          x2 = x1 + offsetX,
+          y2 = y1 - offsetY;
     line (x1,
           y1,
           x2,
@@ -51,10 +52,10 @@ class Platform {
     text(s1,x2, y2);
     
     // T0
-          x1 = x1 - cos(45*3.14159/180.0)*(DPpixels + Spixels);
-          y1 = -sin(45*3.14159/180.0)*(DPpixels + Spixels);
-          x2 = x1 + offset;
-          y2 = y1 - offset;
+          x1 = x1 + conf.cosRA*(DPpixels + Spixels); //cos(45*3.14159/180.0)*(DPpixels + Spixels);
+          y1 =  -conf.sinRA*(DPpixels + Spixels); //-sin(45*3.14159/180.0)*(DPpixels + Spixels);
+          x2 = x1 + offsetX;
+          y2 = y1 - offsetY;
     line (x1,
           y1,
           x2,
@@ -72,7 +73,7 @@ class Platform {
     stroke(conf.tagMarkerColor);
     fill(conf.tagMarkerColor);
     // TB0
-    float TB0x = conf.rampBaseLength + conf.tagBaseLeftOffset + (conf.RHpixels);
+    float TB0x = conf.rampBaseLength + conf.tagBaseLeftOffset + (-conf.RXpixels);
     line (TB0x,
           0,
           TB0x,
@@ -80,7 +81,7 @@ class Platform {
     text("TB0",TB0x, conf.markerLength);
     //println(TB0x);
     // TB
-    float TBx = TB0x + conf.Tpixels; //conf.rampBaseLength + conf.tagBaseLeftOffset + conf.TBpixels-conf.DPTpixels;
+    float TBx = TB0x + conf.Tpixels; 
     line (TBx,
           0,
           TBx,
@@ -114,7 +115,7 @@ class Platform {
     fill(conf.labelMarkerColor);
     stroke(conf.labelMarkerColor);
     // LB0
-    float LB0x = conf.rampBaseLength + conf.labelBaseLeftOffset + conf.RHpixels;
+    float LB0x = conf.rampBaseLength + conf.labelBaseLeftOffset - conf.RXpixels;
     line (LB0x,
           0,
           LB0x,
