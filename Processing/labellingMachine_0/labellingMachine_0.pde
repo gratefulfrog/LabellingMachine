@@ -37,17 +37,8 @@ void setup(){
     lVec[i] =  new Label(config,2);
     lVec[i].nbSteps = -350 *i;
   }
-  /*
-  println(config.TN * config.mm2Steps);
-  tag1.nbSteps = 0;
-  tag1.nbSteps--;
-  tag1.doStep();
-  tag2.nbSteps--;
-  tag2.doStep();
-  tag3.nbSteps=50;
-  tag3.nbSteps--;
-  tag3.doStep();
   
+  /*
   label1.nbSteps = 0;
   label1.nbSteps--;
   label1.doStep();
@@ -55,7 +46,16 @@ void setup(){
   label2.doStep();
   label3.nbSteps=200;
   label3.nbSteps--;
-  label3.doStep();
+  //label3.doStep();
+  
+  tag1.nbSteps = 0;
+  tag1.nbSteps--;
+  tag1.doStep();
+  tag2.nbSteps--;
+  tag2.doStep();
+  tag3.nbSteps=524;
+  tag3.nbSteps--;
+  tag3.doStep();
   */
 }
 
@@ -88,7 +88,7 @@ void draw(){
   background(0);
   platform.draw();
   
-  good2Label = good2Label || (tVec[0].support == 3 && tVec[0].nbSteps > 516);
+  good2Label = good2Label || (tVec[0].support == 3 && tVec[0].nbSteps > 480);
   if (good2Label){
   for (int i = 0; i< nbLabels;i++){
     lVec[i].doStep();
