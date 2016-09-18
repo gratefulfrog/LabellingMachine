@@ -15,10 +15,13 @@ class SyncLock{
     }
   }
   void show(){
-    String ss = binary(syncBits);
+    String ss = String.format("%2s", Integer.toBinaryString(syncBits)).replace(' ', '0'); //binary(syncBits)
+    /*
     int ll = ss.length();
+    */
     print("Sync:\t");
-    println(ss.substring(ll-2,ll));
+    println(ss);
+    //println(ss.substring(ll-2,ll));
   }
 }
 
