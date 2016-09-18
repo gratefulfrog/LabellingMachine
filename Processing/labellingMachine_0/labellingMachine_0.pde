@@ -4,7 +4,7 @@ Platform platform   = new Platform(config);
 
 SyncLock s = new SyncLock();
 
-Boolean CALLOUT =   true; //false;
+Boolean CALLOUT =   false;
 
 final int tagDelay = config.ITsteps,
           labelDelay = config.ILLsteps;
