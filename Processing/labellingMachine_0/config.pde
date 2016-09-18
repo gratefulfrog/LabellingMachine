@@ -14,7 +14,7 @@ class Config{
   
   /***** physical constants *****/
   // conversion factors
-  final float mm2Steps  = 2.0;
+  final int mm2Steps  = 2;
   
   // dimensions in mm
   final int T   = 25,
@@ -41,7 +41,7 @@ class Config{
             T0     = 0,
             T1     = DPT,
             TB0    = round(DPT + DA),
-            TB     = DPT + T,
+            TB     = TB0 + T,
             T2     = TB0 + BIT,
             TN     = TB0 + BTL,
             TClear = TN + BIT,
@@ -52,35 +52,35 @@ class Config{
             LClear = LB0 + BIT;
 
   // dimensions in steps
-  final int Tsteps   = round(T    * mm2Steps),
-            ITsteps  = round(IT   * mm2Steps), 
-            ITesteps = round(ITe  * mm2Steps),
-            Lsteps   = round(L    * mm2Steps),
-            ILLsteps = round(ILL  * mm2Steps),
-            ILLesteps =round(ILL  * mm2Steps),
-            DPTsteps = round(DPT  * mm2Steps),
-            DPLsteps = round(DPL  * mm2Steps),
-            DSsteps  = round(DS   * mm2Steps),
-            RHsteps  = round(RH   * mm2Steps),
-            ILsteps  = round(IL   * mm2Steps);
+  final int Tsteps   = (T    * mm2Steps),
+            ITsteps  = (IT   * mm2Steps), 
+            ITesteps = (ITe  * mm2Steps),
+            Lsteps   = (L    * mm2Steps),
+            ILLsteps = (ILL  * mm2Steps),
+            ILLesteps =(ILL  * mm2Steps),
+            DPTsteps = (DPT  * mm2Steps),
+            DPLsteps = (DPL  * mm2Steps),
+            DSsteps  = (DS   * mm2Steps),
+            RHsteps  = (RH   * mm2Steps),
+            ILsteps  = (IL   * mm2Steps);
   
             
   // derived values
-  final int BITsteps    = round(BIT    * mm2Steps),
-            TLSsteps    = round(TLS    * mm2Steps),
-            BTLsteps    = round(BTL    * mm2Steps),
-            T0steps     = round(T0     * mm2Steps),
-            T1steps     = round(T1     * mm2Steps),
-            TB0steps    = round(TB0    * mm2Steps),
-            TBsteps     = round(TB     * mm2Steps),
-            T2steps     = round(T2     * mm2Steps),
-            TNsteps     = round(TN     * mm2Steps),
-            TClearsteps = round(TClear * mm2Steps),
-            L0steps     = round(L0     * mm2Steps),
-            L1steps     = round(L1     * mm2Steps),
-            LB0steps    = round(LB0    * mm2Steps),
-            LBsteps     = round(LB     * mm2Steps),
-            LClearsteps = round(LClear * mm2Steps) ;
+  final int BITsteps    = (BIT    * mm2Steps),
+            TLSsteps    = (TLS    * mm2Steps),
+            BTLsteps    = (BTL    * mm2Steps),
+            T0steps     = (T0     * mm2Steps),
+            T1steps     = (T1     * mm2Steps),
+            TB0steps    = (TB0    * mm2Steps),
+            TBsteps     = (TB     * mm2Steps),
+            T2steps     = (T2     * mm2Steps),
+            TNsteps     = (TN     * mm2Steps),
+            TClearsteps = (TClear * mm2Steps),
+            L0steps     = (L0     * mm2Steps),
+            L1steps     = (L1     * mm2Steps),
+            LB0steps    = (LB0    * mm2Steps),
+            LBsteps     = (LB     * mm2Steps),
+            LClearsteps = (LClear * mm2Steps) ;
  
                         
   /******** Simulation Variables part 2 **************/
@@ -113,34 +113,36 @@ class Config{
             LHpixels = round(LH * mm2Pixels);
 
 // dimensions in pixels
-  final int Tpixels   = round(T    * mm2Pixels),
-            ITpixels  = round(IT   * mm2Pixels), 
-            ITepixels = round(ITe  * mm2Pixels),
-            Lpixels   = round(L    * mm2Pixels),
-            ILLpixels = round(ILL  * mm2Pixels),
-            ILLepixels =round(ILL  * mm2Pixels),
-            DPTpixels = round(DPT  * mm2Pixels),
-            DPLpixels = round(DPL  * mm2Pixels),
-            DSpixels  = round(DS   * mm2Pixels),
-            RHpixels  = round(RH   * mm2Pixels),
-            ILpixels  = round(IL   * mm2Pixels);
+  final float Tpixels   = (T    * mm2Pixels),
+            ITpixels  = (IT   * mm2Pixels), 
+            ITepixels = (ITe  * mm2Pixels),
+            Lpixels   = (L    * mm2Pixels),
+            ILLpixels = (ILL  * mm2Pixels),
+            ILLepixels =(ILL  * mm2Pixels),
+            DPTpixels = (DPT  * mm2Pixels),
+            DPLpixels = (DPL  * mm2Pixels),
+            DSpixels  = (DS   * mm2Pixels),
+            RHpixels  = (RH   * mm2Pixels),
+            ILpixels  = (IL   * mm2Pixels);
+            
+  final float DApixels = DA * mm2Pixels;
   
   // derived values
-  final int BITpixels    = round(BIT    * mm2Pixels),
-            TLSpixels    = round(TLS    * mm2Pixels),
-            BTLpixels    = round(BTL    * mm2Pixels),
-            T0pixels     = round(T0     * mm2Pixels),
-            T1pixels     = round(T1     * mm2Pixels),
-            TB0pixels    = round(TB0    * mm2Pixels),
-            TBpixels     = round(TB     * mm2Pixels),
-            T2pixels     = round(T2     * mm2Pixels),
-            TNpixels     = round(TN     * mm2Pixels),
-            TClearpixels = round(TClear * mm2Pixels),
-            L0pixels     = round(L0     * mm2Pixels),
-            L1pixels     = round(L1     * mm2Pixels),
-            LB0pixels    = round(LB0    * mm2Pixels),
-            LBpixels     = round(LB     * mm2Pixels),
-            LClearpixels = round(LClear * mm2Pixels) ;
+  final float BITpixels    = (BIT    * mm2Pixels),
+            TLSpixels    = (TLS    * mm2Pixels),
+            BTLpixels    = (BTL    * mm2Pixels),
+            T0pixels     = (T0     * mm2Pixels),
+            T1pixels     = (T1     * mm2Pixels),
+            TB0pixels    = (TB0    * mm2Pixels),
+            TBpixels     = (TB     * mm2Pixels),
+            T2pixels     = (T2     * mm2Pixels),
+            TNpixels     = (TN     * mm2Pixels),
+            TClearpixels = (TClear * mm2Pixels),
+            L0pixels     = (L0     * mm2Pixels),
+            L1pixels     = (L1     * mm2Pixels),
+            LB0pixels    = (LB0    * mm2Pixels),
+            LBpixels     = (LB     * mm2Pixels),
+            LClearpixels = (LClear * mm2Pixels) ;
   
   
   // markers:  

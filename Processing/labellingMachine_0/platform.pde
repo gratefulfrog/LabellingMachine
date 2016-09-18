@@ -72,14 +72,15 @@ class Platform {
     stroke(conf.tagMarkerColor);
     fill(conf.tagMarkerColor);
     // TB0
-    int TB0x = conf.rampBaseLength + conf.tagBaseLeftOffset + conf.TB0pixels-conf.DPTpixels;
+    float TB0x = conf.rampBaseLength + conf.tagBaseLeftOffset + (conf.RHpixels);
     line (TB0x,
           0,
           TB0x,
           conf.markerLength);
     text("TB0",TB0x, conf.markerLength);
+    //println(TB0x);
     // TB
-    int TBx =conf.rampBaseLength + conf.tagBaseLeftOffset + conf.TBpixels-conf.DPTpixels;
+    float TBx = TB0x + conf.Tpixels; //conf.rampBaseLength + conf.tagBaseLeftOffset + conf.TBpixels-conf.DPTpixels;
     line (TBx,
           0,
           TBx,
@@ -87,7 +88,7 @@ class Platform {
     text("TB",TBx, conf.markerLength);
     
     // T2
-    int T2x =conf.rampBaseLength + conf.tagBaseLeftOffset + conf.T2pixels-conf.DPTpixels;
+    float T2x = TB0x + conf.BITpixels; //conf.rampBaseLength + conf.tagBaseLeftOffset + conf.T2pixels-conf.DPTpixels;
     line (T2x,
           0,
           T2x,
@@ -95,7 +96,7 @@ class Platform {
     text("T2",T2x, conf.markerLength);
     
     // TN
-    int TNx =conf.rampBaseLength + conf.tagBaseLeftOffset + conf.TNpixels-conf.DPTpixels;
+    float TNx = TB0x + conf.BTLpixels;
     line (TNx,
           0,
           TNx,
@@ -103,7 +104,7 @@ class Platform {
     text("TN",TNx, conf.markerLength);
     
     // TClear
-    int TClearx =conf.rampBaseLength + conf.tagBaseLeftOffset + conf.TClearpixels-conf.DPTpixels;
+    float TClearx =TNx + conf.BITpixels;// conf.rampBaseLength + conf.tagBaseLeftOffset + conf.TClearpixels-conf.DPTpixels;
     line (TClearx,
           0,
           TClearx,
@@ -113,24 +114,25 @@ class Platform {
     fill(conf.labelMarkerColor);
     stroke(conf.labelMarkerColor);
     // LB0
-    int LB0x = conf.rampBaseLength + conf.labelBaseLeftOffset + conf.LB0pixels - conf.DPLpixels;
+    float LB0x = conf.rampBaseLength + conf.labelBaseLeftOffset + conf.RHpixels;
     line (LB0x,
           0,
           LB0x,
           conf.markerLength);
     text("LB0",LB0x, conf.markerLength);
+    //println(LB0x);
     // LB
     textAlign(RIGHT,TOP);
-    int LBx =conf.rampBaseLength + conf.labelBaseLeftOffset + conf.LBpixels-conf.DPLpixels;
+    float LBx = LB0x + conf.Lpixels; // conf.rampBaseLength + conf.labelBaseLeftOffset + conf.LBpixels-conf.DPLpixels;
     line (LBx,
           0,
           LBx,
           conf.markerLength);
     text("LB",LBx, conf.markerLength);
-    
+    //println(LBx);
     // LClear
     textAlign(LEFT,TOP);
-    int LClearx =conf.rampBaseLength + conf.labelBaseLeftOffset + conf.LClearpixels-conf.DPLpixels;
+    float LClearx = LB0x + conf.BITpixels; // conf.rampBaseLength + conf.labelBaseLeftOffset + conf.LClearpixels-conf.DPLpixels;
     line (LClearx,
           0,
           LClearx,
@@ -144,10 +146,14 @@ class Platform {
     translate(conf.baseX,conf.baseY);
     drawBase();
     drawBaseMarkers();
-    translate(conf.tagBaseLeftOffset,-conf.rampHeight);
+    popMatrix();
+    pushMatrix();
+    translate(conf.baseX+conf.tagBaseLeftOffset,conf.baseY-conf.rampHeight);
     drawRamp();
     drawRampMarkers(false);
-    translate(conf.labelBaseLeftOffset - conf.tagBaseLeftOffset,0);
+    popMatrix();
+    pushMatrix();
+    translate(conf.baseX+conf.labelBaseLeftOffset,conf.baseY-conf.rampHeight);
     drawRamp();
     drawRampMarkers(true);
     popMatrix();
