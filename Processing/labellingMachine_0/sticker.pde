@@ -15,6 +15,9 @@ class SyncLock{
     }
   }
   void show(){
+    if (!showSync){
+      return;
+    }
     //String ss = String.format("%2s", Integer.toBinaryString(syncBits)).replace(' ', '0'); //binary(syncBits)
     String ss = binary(syncBits);
     int ll = ss.length();
