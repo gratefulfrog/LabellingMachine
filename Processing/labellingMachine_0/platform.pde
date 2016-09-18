@@ -6,12 +6,15 @@ class Platform {
   
   void drawRamp(){
     stroke(conf.platformColor);
+    // baseline
     line(0,0,
          conf.rampBaseLength,0);
+    
+    // slope
     line(conf.rampBaseLength,
          0,
-         conf.rampBaseLength + conf.rampSlopeLength*cos(conf.rampSlopeAngle),
-         -conf.rampSlopeLength*sin(conf.rampSlopeAngle));
+         conf.rampBaseLength + conf.rampSlopeLength*conf.rampSlopeCos,
+         -conf.rampSlopeLength*conf.rampSlopeSin);
   }
   void drawRampMarkers(boolean isLabeller){
     textAlign(LEFT,BOTTOM);

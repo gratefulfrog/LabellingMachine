@@ -49,8 +49,8 @@ class Tag extends Sticker{
   }
   void doStep(){
     if (support !=3){
-      startX = conf.baseX  + conf.tagBaseLeftOffset + conf.rampBaseLength + (conf.Tpixels +conf.DPTpixels)*cos(conf.rampSlopeAngle);
-      startY = conf.baseY -conf.rampHeight - (conf.Tpixels +conf.DPTpixels)*sin(conf.rampSlopeAngle);
+      startX = conf.baseX  + conf.tagBaseLeftOffset + conf.rampBaseLength + (conf.Tpixels +conf.DPTpixels)*conf.rampSlopeCos;
+      startY = conf.baseY -conf.rampHeight - (conf.Tpixels +conf.DPTpixels)*conf.rampSlopeSin;
     }
     else{
       startX = conf.baseX -conf.Tpixels + conf.tagBaseLeftOffset + conf.rampBaseLength  + conf.rampHeight;
@@ -77,11 +77,11 @@ class Label extends Sticker{
   void doStep(){
     if (support !=3){
       /*
-      startX = conf.baseX -conf.Lpixels + conf.labelBaseLeftOffset + conf.rampBaseLength + conf.rampSlopeLength*cos(conf.rampSlopeAngle);
-      startY = conf.baseY -conf.Lpixels -conf.rampHeight - conf.rampSlopeLength*sin(conf.rampSlopeAngle);
+      startX = conf.baseX -conf.Lpixels + conf.labelBaseLeftOffset + conf.rampBaseLength + conf.rampSlopeLength*conf.rampSlopeCos;
+      startY = conf.baseY -conf.Lpixels -conf.rampHeight - conf.rampSlopeLength*conf.rampSlopeSin;
       */
-      startX = conf.baseX + conf.labelBaseLeftOffset + conf.rampBaseLength + (conf.Lpixels +conf.DPLpixels)*cos(conf.rampSlopeAngle);
-      startY = conf.baseY -conf.rampHeight - (conf.Lpixels +conf.DPLpixels)*sin(conf.rampSlopeAngle);
+      startX = conf.baseX + conf.labelBaseLeftOffset + conf.rampBaseLength + (conf.Lpixels +conf.DPLpixels)*conf.rampSlopeCos;
+      startY = conf.baseY -conf.rampHeight - (conf.Lpixels +conf.DPLpixels)*conf.rampSlopeSin;
   }
     else{
       startX = conf.baseX  -conf.Lpixels + conf.labelBaseLeftOffset + conf.rampBaseLength + conf.rampHeight;

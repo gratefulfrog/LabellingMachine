@@ -6,36 +6,43 @@ class Config{
             windowHeight = 300;
   
   final int frameRate = 200;
-  
-  final float mm2Pixels = windowWidth/900.0;
+
+  // conversion factors
+  final float mm2Pixels = windowWidth/900.0;  // 2.0 so 10mm = 20 pixels
   
   // Platform Dimensions in pixels
-  final int baseLength  = round(810 * mm2Pixels),
-            baseHeight  = 50,
-            rampHeight  = round(9.5 * mm2Pixels),
-            rampBaseLength  = round(106 * mm2Pixels),
-            rampSlopeLength  = round(150 * mm2Pixels),
-            tagBaseLeftOffset = round(50 * mm2Pixels),
+  final int baseLength          = round(810 * mm2Pixels),
+            baseHeight          = 50,
+            //rampHeight          = round(9.5 * mm2Pixels),
+            rampHeight          = round(2 * mm2Pixels),
+            rampBaseLength      = round(106 * mm2Pixels),
+            rampSlopeLength     = round(150 * mm2Pixels),
+            tagBaseLeftOffset   = round(50 * mm2Pixels),
             labelBaseLeftOffset = round(350 * mm2Pixels),
             baseX               = round((windowWidth - baseLength)/2.0),
             baseY               = windowHeight - baseHeight;
 
-  final float rampSlopeAngle   = 135 * 3.14159/180.0;
+  final float rampSlopeAngle = PI- QUARTER_PI, //135 * 3.14159/180.0;
+              rampSlopeSin   = sin(rampSlopeAngle),
+              rampSlopeCos   = cos(rampSlopeAngle),
+              rampSlopeTan   = tan(rampSlopeAngle);
   
   final color platformColor = #FFFFFF;
             
   /******** END Simulation Variables part 1**************/
   
 
-  // physical constants
+  /***** physical constants *****/
+  // conversion factors
   final float mm2Steps  = 2.0;
-
-    final int T   = 25,
-              L   = 100,
-              DPT = 5,
-              DPL = 8,
-              DS  = 300,
-              IL  = 5;
+  
+  // dimensions in mm
+  final int T   = 25,
+            L   = 100,
+            DPT = 5,
+            DPL = 8,
+            DS  = 300,
+            IL  = 5;
             
   // derived values
   final int BIT    = IL +L,
@@ -55,13 +62,14 @@ class Config{
   
                         
   /******** Simulation Variables part 2 **************/
-
+  //  conversion factors
   final float steps2Pixels =  mm2Pixels/mm2Steps;  
+
   // Sticker heights
-  // mm
-  final int TH = 2,
+  // mm & pixels
+  final int TH = 1,
             THpixels = round(TH * mm2Pixels),
-            LH = 4,
+            LH = 2,
             LHpixels = round(LH * mm2Pixels);
       
   // positions in pixels
