@@ -64,7 +64,7 @@ Tag updateTag(Tag t){
     t = new Tag(config,1);
     t.nbSteps = -250;
   }
-  else if (t.support == 1 && t.nbSteps>36){
+  else if (t.support == 1 && t.nbSteps>config.TB0steps){
     t.support = 3;// = new Tag(config,1);
     t.nbSteps = 0;
   }
@@ -75,7 +75,7 @@ Label updateLabel(Label l){
     l = new Label(config,2);
     l.nbSteps = -350;
   }
-  else if (l.support == 2 && l.nbSteps>43){
+  else if (l.support == 2 && l.nbSteps>config.LB0steps){
     l.support = 3;// = new Tag(config,1);
     l.nbSteps = 0;
   }
@@ -88,7 +88,7 @@ void draw(){
   background(0);
   platform.draw();
   
-  good2Label = good2Label || (tVec[0].support == 3 && tVec[0].nbSteps > 480);
+  good2Label = good2Label || (tVec[0].support == 3 && tVec[0].nbSteps > config.TNsteps);
   if (good2Label){
   for (int i = 0; i< nbLabels;i++){
     lVec[i].doStep();

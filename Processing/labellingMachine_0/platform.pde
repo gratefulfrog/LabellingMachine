@@ -71,6 +71,13 @@ class Platform {
     textSize(conf.markerTextSize);
     stroke(conf.tagMarkerColor);
     fill(conf.tagMarkerColor);
+    // TB0
+    int TB0x = conf.rampBaseLength + conf.tagBaseLeftOffset + conf.TB0pixels-conf.DPTpixels;
+    line (TB0x,
+          0,
+          TB0x,
+          conf.markerLength);
+    text("TB0",TB0x, conf.markerLength);
     // TB
     int TBx =conf.rampBaseLength + conf.tagBaseLeftOffset + conf.TBpixels-conf.DPTpixels;
     line (TBx,
@@ -105,6 +112,13 @@ class Platform {
     
     fill(conf.labelMarkerColor);
     stroke(conf.labelMarkerColor);
+    // LB0
+    int LB0x = conf.rampBaseLength + conf.labelBaseLeftOffset + conf.LB0pixels - conf.DPLpixels;
+    line (LB0x,
+          0,
+          LB0x,
+          conf.markerLength);
+    text("LB0",LB0x, conf.markerLength);
     // LB
     textAlign(RIGHT,TOP);
     int LBx =conf.rampBaseLength + conf.labelBaseLeftOffset + conf.LBpixels-conf.DPLpixels;
