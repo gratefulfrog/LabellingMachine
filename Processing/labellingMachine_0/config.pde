@@ -13,30 +13,36 @@ class Config{
   /******** END Simulation Variables part 1**************/
   
   /***** physical constants *****/
+  
+  /**************   USER CONFIGRABLE VALUES *******************/
+
   // conversion factors
   final int mm2Steps  = 2;
   
-  // dimensions in mm
-  final int T   = 25,
-            IT  = 35,
-            ITe = 17,  // max 17 not tested!
-            L   = 100,
-            ILL = 5,
-            ILLe = 2, // MAX is 2 !!
-            DPT = 5,
-            DPL = 3,
-            DS  = 300,
-            RH  = 2,
-            IL  = 5;
-  final float RAdegrees = 21,
-              RA = PI*(180-RAdegrees)/180.0, //PI- QUARTER_PI,
-              sinRA = sin(RA),
-              cosRA = cos(RA),
-              tanRA = tan(RA),
-              DA    = RH/sinRA,
-              RX    = RH/tanRA;
+  // Physical dimensions in mm
+  final int T   = 25,  // tag length
+            IT  = 35,  // inter tag distance on feeder roll
+            ITe = 17,  // maximum intertag distance variation; max is 17!
+            L   = 100, // label length
+            ILL = 5,   // inter label distance on feed reel
+            ILLe = 2,  // inter label distance error; MAX is 2 !!
+            DPT = 5,   // distance from tag detection point to tag ramp end, must be less than IT
+            DPL = 3,   // distance from label detection point to label ramp end, must be less than ILL
+            DS  = 300, // horizontal distance between the ramp ends
+            RH  = 2,   // ramp height above backer
+            IL  = 5;   // inter label distance of output label+tag combinations
             
-  // derived values
+  final float RAdegrees = 21,  // ramp angle is a user configurable value
+              RA = PI*(180-RAdegrees)/180.0, // not a user variable
+              sinRA = sin(RA),               // not a user variable 
+              cosRA = cos(RA),               // not a user variable
+              tanRA = tan(RA),               // not a user variable
+              DA    = RH/sinRA,              // not a user variable
+              RX    = RH/tanRA;              // not a user variable
+
+   /**************   END OF USER CONFIGRABLE VALUES *******************/          
+
+  // derived values not user variables!
   final int BIT    = IL +L,
             TLS    = round((L-T)/2.0),
             BTL    = (DS-TLS),
