@@ -18,7 +18,7 @@ class Config{
   
   // dimensions in mm
   final int T   = 25,
-            IT  = 25,
+            IT  = 35,
             ITe = 0,  // no error yet!
             L   = 100,
             ILL = 5,
