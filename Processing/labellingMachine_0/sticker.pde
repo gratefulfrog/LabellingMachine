@@ -114,7 +114,7 @@ class Sticker extends Sticker_{
         startY = conf.baseY -conf.rampHeight - (conf.Tpixels +conf.DPTpixels)*conf.rampSlopeSin;
       }
       else{
-        startX = conf.baseX - conf.Tpixels + conf.tagBaseLeftOffset + conf.rampBaseLength + conf.RXpixels;// conf.TB0pixels *conf.cosRA;
+        startX = conf.baseX - conf.Tpixels + conf.tagBaseLeftOffset + conf.rampBaseLength - conf.TB0pixels - conf.rampHeight/conf.tanRA; //+ conf.RXpixels;// conf.TB0pixels *conf.cosRA;
         startY = conf.baseY;
       }
     }
@@ -124,7 +124,7 @@ class Sticker extends Sticker_{
         startY = conf.baseY -conf.rampHeight - (conf.Lpixels +conf.DPLpixels)*conf.rampSlopeSin;
       }
       else{
-        startX = conf.baseX  + conf.labelBaseLeftOffset + conf.rampBaseLength - conf.Lpixels -conf.LB0pixels - conf.rampHeight/conf.tanRA; 
+        startX = conf.baseX  - conf.Lpixels + conf.labelBaseLeftOffset + conf.rampBaseLength  - conf.LB0pixels - conf.rampHeight/conf.tanRA; 
         startY = conf.baseY;
       }
     }

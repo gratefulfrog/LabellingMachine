@@ -94,7 +94,7 @@ class Config{
   // Platform Dimensions in pixels
   final int baseLength          = round(810 * mm2Pixels),
             baseHeight          = 50,
-            rampHeight          = round(2 * mm2Pixels),
+            rampHeight          = round(RH * mm2Pixels),
             rampBaseLength      = round(106 * mm2Pixels),
             rampSlopeLength     = round(150 * mm2Pixels),
             tagBaseLeftOffset   = round(50 * mm2Pixels),
