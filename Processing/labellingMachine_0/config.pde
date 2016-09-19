@@ -62,10 +62,11 @@ class Config{
             DPTsteps = (DPT  * mm2Steps),
             DPLsteps = (DPL  * mm2Steps),
             DSsteps  = (DS   * mm2Steps),
+            DAsteps  = round(DA   * mm2Steps),
             RHsteps  = (RH   * mm2Steps),
             RXsteps  = round(RX   * mm2Steps),
             ILsteps  = (IL   * mm2Steps);
-  
+            
             
   // derived values
   final int BITsteps    = (BIT    * mm2Steps),

@@ -12,6 +12,8 @@ Boolean CALLOUTtags   = false,
 
 Boolean lop =  true;
 
+Boolean blockAtRampEnd =  true;
+
 final int tagDelay = config.ITsteps,
           labelDelay = config.ILLsteps;
 /*
@@ -63,76 +65,7 @@ void setup(){
   tagger   = new Driver(1, s, tVec, null);
   labeller = new Driver(2, s, null, lVec);
   backer   = new Driver(3,s,tVec,lVec);
-  //tagger.stepOK = false;
-  /*
-  String ss = binary(s.syncBits);
-  int ll = ss.length();
-  println(ss.substring(ll-2,ll));
-  s.sync(0,false);
-  ss = binary(s.syncBits);
-  println(ss.substring(ll-2,ll));
-  s.sync(0,true);
-  ss = binary(s.syncBits);
-  println(ss.substring(ll-2,ll));
-  s.sync(0,false);
-  ss = binary(s.syncBits);
-  println(ss.substring(ll-2,ll));
-  
-  s.sync(1,false);
-  ss = binary(s.syncBits);
-  println(ss.substring(ll-2,ll));
-  s.sync(1,true);
-  ss = binary(s.syncBits);
-  println(ss.substring(ll-2,ll));
-  s.sync(1,true);
-  ss = binary(s.syncBits);
-  println(ss.substring(ll-2,ll));
-  s.sync(0,true);
-  ss = binary(s.syncBits);
-  println(ss.substring(ll-2,ll));
-  */
-  //println(config.TB0pixels - config.T1pixels);
-  //println(config.LB0pixels - config.L1pixels);
-  
-  /*
-//  label1.nbSteps--;
-  //label1.doStep();
-  label2.nbSteps = config.LB0steps;
-  label2.nbSteps--;
-  label2.doStep();
-  
-  /*
-  label3.nbSteps=200;
-  label3.nbSteps--;
-  label3.doStep();
-  
-  tag1.nbSteps =config.TNsteps;
-  tag1.nbSteps--;
-  tag1.doStep();
-  /*
-  tag2.nbSteps = config.TClearsteps;
-  tag2.nbSteps--;
-  tag2.doStep();
-  
-  println(config.T1steps);
-  println(tag2.nbSteps);
-  */
-  //tag3.nbSteps=524;
-  //tag3.nbSteps--;
-  //tag3.doStep();
- /* stroke(#00FF00);
-  fill(#00FF00);
-  println(config.tanRA);
-  println(config.rampSlopeSin == config.sinRA);
-  float //startX = config.baseX  + config.tagBaseLeftOffset   + config.rampBaseLength - config.Lpixels - config.rampHeight/config.tanRA, //+ (config.Lpixels+config.LB0pixels) *config.cosRA,
-        startX =   config.baseX  + config.labelBaseLeftOffset + config.rampBaseLength - config.Lpixels - config.rampHeight/config.tanRA,//+ -config.Lpixels + (config.L1pixels) *config.cosRA, //- config.Lpixels - config.rampHeight/config.tanRA,// - 220*cos(QUARTER_PI), // // config.baseX - config.Lpixels + config.labelBaseLeftOffset + config.rampBaseLength + config.LB0pixels *config.cosRA; 
-        startY = config.baseY -15*config.rampHeight;
-  pushMatrix();
-  translate(startX,startY);
-  rect(0,0,200,50);
-  popMatrix();
-  */
-  
+  setStopPoints();
 }
 
 //Tag updateTag(Tag t){
@@ -225,6 +158,16 @@ void doLabelCallouts(){
 }
 
 /*
+Blocking rules:
+
+if we set to blockAtRampEnd, then we use 
+* T0 instead of TB0 in 1st condition tagger rule,
+* still use TB0 in second condition of tagger rule.
+* L0 instead of LB0 in labeller rule
+* TN-DAsteps instead of TN
+* T2-DAsteps instead of T2
+
+
 The following conditions may lead to Inter blocking!!!
 The labeller cannot advance if there is a label at LB0 and (there is not tag that at TN  OR  if the backer cannot advance). wait on backer
 The tagger   cannot advance if there is a tag at TB0  and (there is a tag having stepped s such that TB0 < s < T2  OR  if the backer cannot advance)! wait on backer 
@@ -232,9 +175,31 @@ The backer   cannot advance if a tag is at T2 and no TAG is at TB0 ! wait on tag
 The backer   cannot advance if a tag is at TN and no label is at LB0 ! wait on labeller
 */
 
+int labellerStopPoint = config.LB0steps,
+    taggerStopPoint   = config.TB0steps,
+    backerTagWaitTagPoint = config.T2steps,    
+    backerTagWaitLabelPoint = config.TNsteps;
+
+void  setStopPoints(){
+  if(!blockAtRampEnd){
+    labellerStopPoint       = config.LB0steps;
+    taggerStopPoint         = config.TB0steps;
+    backerTagWaitTagPoint   = config.T2steps;    
+    backerTagWaitLabelPoint = config.TNsteps;
+  }
+  else {
+    labellerStopPoint       = config.LB0steps - config.DAsteps;
+    taggerStopPoint         = config.TB0steps - config.DAsteps;
+    backerTagWaitTagPoint   = config.T2steps  - config.DAsteps;
+    backerTagWaitLabelPoint = config.TNsteps  - config.DAsteps;
+  }
+}
+
+
 boolean tagAtTB0(){
   for (int i=0;i<tVec.length;i++){
-    if (tVec[i].nbSteps == config.TB0steps){
+    //if (tVec[i].nbSteps == config.TB0steps){
+    if (tVec[i].nbSteps == taggerStopPoint){
       return true;
     }
   }
@@ -242,7 +207,8 @@ boolean tagAtTB0(){
 }
 boolean tagAtT2(){
   for (int i=0;i<tVec.length;i++){
-    if (tVec[i].nbSteps == config.T2steps){
+    //if (tVec[i].nbSteps == config.T2steps){
+    if (tVec[i].nbSteps == backerTagWaitTagPoint){
       return true;
     }
   }
@@ -250,7 +216,8 @@ boolean tagAtT2(){
 }
 boolean tagAtTN(){
   for (int i=0;i<tVec.length;i++){
-    if (tVec[i].nbSteps == config.TNsteps){
+    //if (tVec[i].nbSteps == config.TNsteps){
+    if (tVec[i].nbSteps == backerTagWaitLabelPoint){
       return true;
     }
   }
@@ -258,7 +225,8 @@ boolean tagAtTN(){
 }
 boolean tagbetweenTB0andT2(){
   for (int i=0;i<tVec.length;i++){
-    if ((tVec[i].nbSteps > config.TB0steps) && (tVec[i].nbSteps < config.T2steps)){
+    //if ((tVec[i].nbSteps > config.TB0steps) && (tVec[i].nbSteps < config.T2steps)){
+    if ((tVec[i].nbSteps > config.TB0steps) && (tVec[i].nbSteps < backerTagWaitTagPoint)){
       return true;
     }
   }
@@ -266,7 +234,8 @@ boolean tagbetweenTB0andT2(){
 }
 boolean labelAtLB0(){
   for (int i=0;i<lVec.length;i++){
-    if (lVec[i].nbSteps == config.LB0steps){
+    //if (lVec[i].nbSteps == config.LB0steps){
+    if (lVec[i].nbSteps == labellerStopPoint){
       return true;
     }
   }
@@ -412,7 +381,10 @@ void keyPressed(){
   else  if ((key == 'P') || (key == 'p')){
     stopAtMessage = !stopAtMessage;
   }
-  else  if ((key == 'S') || (key == 's')){
+  else  if ((key == 'R') || (key == 'r')){
+    blockAtRampEnd = !blockAtRampEnd;
+    setStopPoints();    
+  }else  if ((key == 'S') || (key == 's')){
     showSync = !showSync;
   }
   else  if ((key == 'T') || (key == 't')){
