@@ -5,7 +5,7 @@ class Config{
   final int windowWidth  = 1800,
             windowHeight = 300;
   
-  final int frameRate =50;
+  int speed = 50;
 
   // conversion factors
   final float mm2Pixels = windowWidth/900.0;  // 2.0 so 10mm = 20 pixels
@@ -28,7 +28,8 @@ class Config{
             DS  = 300,
             RH  = 2,
             IL  = 5;
-  final float RA    = PI*(180-21)/180.0, //PI- QUARTER_PI,
+  final float RAdegrees = 21,
+              RA = PI*(180-RAdegrees)/180.0, //PI- QUARTER_PI,
               sinRA = sin(RA),
               cosRA = cos(RA),
               tanRA = tan(RA),
@@ -160,4 +161,9 @@ class Config{
 
 
   Config(){};
+  
+  void setSpeed(boolean faster){
+    speed = round(faster ? speed*1.5 : speed * 0.5);
+    frameRate(speed);
+  }
 }

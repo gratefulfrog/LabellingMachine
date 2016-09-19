@@ -48,7 +48,7 @@ void settings() {
 */
 void setup(){
   size(1800,300);
-  frameRate(config.frameRate);  // nb steps per second
+  frameRate(config.speed);  // nb steps per second
   background(0);
   //tVec = new Tag[nbTags];
   tVec = new Sticker[nbTags];
@@ -372,8 +372,14 @@ void keyPressed(){
         showBlocking  = false,
         stopAtMessage = false;
         */
-  if ((key == 'B') || (key == 'b')){
+  if ((key == 'A') || (key == 'a')){
+    config.setSpeed(true);
+  }
+  else if ((key == 'B') || (key == 'b')){
     showBlocking = !showBlocking;
+  }
+  else  if ((key == 'D') || (key == 'd')){
+    config.setSpeed(false);
   }
   else  if ((key == 'L') || (key == 'l')){
     CALLOUTlabels = !CALLOUTlabels;
