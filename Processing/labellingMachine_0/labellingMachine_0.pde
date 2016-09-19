@@ -7,7 +7,7 @@ SyncLock s = new SyncLock();
 Boolean CALLOUTtags   = false,
         CALLOUTlabels = false,
         showSync      = false,
-        showBlocking  = false;
+        showBlocking  = true;
 
 final int tagDelay = config.ITsteps,
           labelDelay = config.ILLsteps;
@@ -33,6 +33,8 @@ Sticker lVec[];
 Driver tagger,  
        labeller,
        backer;
+
+boolean blocked[] = {false,false,false};
 
 /*
 void settings() {
@@ -221,22 +223,6 @@ The backer   cannot advance if a tag is at T2 and no TAG is at TB0 ! wait on tag
 The backer   cannot advance if a tag is at TN and no label is at LB0 ! wait on labeller
 */
 
-boolean backerCanAdvance(){
-  boolean resNot0 = (tagAtT2() && ! tagAtTB0()),
-          resNot1 = (tagAtTN() && ! labelAtLB0()),
-          resNot = resNot0 || resNot1;
-  if (!showBlocking){
-    return !resNot;
-  }
-  if (resNot0){
-    println("\t\t\t\tBacker blocked on: TAGGER!");
-  }
-  if (resNot1){
-    println("\t\t\t\t\t\tBacker blocked on: LABELLER!");
-  }
-  return !resNot;
-}
-  
 
 boolean labelAtLB0(){
   for (int i=0;i<lVec.length;i++){
@@ -246,18 +232,6 @@ boolean labelAtLB0(){
   }
   return false;
 }
- 
-boolean labellerCanAdvance(){
-  boolean resNot = (labelAtLB0() && (!backerCanAdvance() || ! tagAtTN()));
-  if (!showBlocking){
-    return !resNot;
-  }
-  if (resNot){
-    println("\t\tLabeller blocked!");
-  }
-  return !resNot;
-}
-
 boolean tagAtTB0(){
   for (int i=0;i<tVec.length;i++){
     if (tVec[i].nbSteps == config.TB0steps){
@@ -290,17 +264,74 @@ boolean tagbetweenTB0andT2(){
   }
   return false;
 }
+void printSpace(int n){
+  for (int i=0;i<n;i++){
+    print("-  ");
+  }
+}
 
 boolean taggerCanAdvance(){
   boolean resNot = (tagAtTB0() && (!backerCanAdvance() || tagbetweenTB0andT2()));
   if (!showBlocking){
     return !resNot;
   }
-  if (resNot){
+  if (resNot && !blocked[0]){
+    blocked[0] = resNot;
     println("Tagger blocked!");
+  }
+  else if (!resNot && blocked[0]){
+     blocked[0] = resNot;
+     println("Tagger released!");
   }
   return !resNot;
 }
+
+boolean labellerCanAdvance(){
+  boolean resNot = (labelAtLB0() && (!backerCanAdvance() || ! tagAtTN()));
+  if (!showBlocking){
+    return !resNot;
+  }
+  if (resNot && !blocked[1]){
+    blocked[1] = resNot;
+    //println("\t\tLabeller blocked!");
+    printSpace(20);
+    println("Labeller blocked!");
+  }
+  else if (!resNot &&  blocked[1]){
+    blocked[1] = resNot;
+    //println("\t\tLabeller released.");
+    printSpace(20);
+    println("Labeller released.");
+  }
+  return !resNot;
+}
+boolean backerCanAdvance(){
+  boolean resNot0 = (tagAtT2() && ! tagAtTB0()),
+          resNot1 = (tagAtTN() && ! labelAtLB0()),
+          resNot = resNot0 || resNot1;
+  if (!showBlocking){
+    return !resNot;
+  }
+  if (resNot0 && ! blocked[2]){
+    blocked[2] = true;
+    //println("\t\t\t\tBacker blocked on: TAGGER!");
+    printSpace(40);
+    println("Backer blocked on: TAGGER!");
+  }
+  if (resNot1  && ! blocked[2]){
+    blocked[2] = true;
+    //println("\t\t\t\tBacker blocked on: LABELLER!");
+    printSpace(40);
+    println("Backer blocked on: LABELLER!");
+  }
+  if (!resNot && blocked[2]){
+    blocked[2] = resNot;
+    //println("\t\t\t\tBacker released.");
+    printSpace(40);
+    println("Backer released.");
+  }
+  return !resNot;
+} 
 
 
 void draw(){
