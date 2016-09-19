@@ -7,7 +7,10 @@ SyncLock s = new SyncLock();
 Boolean CALLOUTtags   = false,
         CALLOUTlabels = false,
         showSync      = false,
-        showBlocking  = true;
+        showBlocking  = false,
+        stopAtMessage = false;
+
+Boolean lop =  true;
 
 final int tagDelay = config.ITsteps,
           labelDelay = config.ILLsteps;
@@ -154,8 +157,14 @@ Sticker updateLabel(Sticker l){
 Boolean good2Label = false;
 
 void doStop(){
-  noLoop();
-  lop  = false;
+  if (!stopAtMessage){
+    lop  = true;
+    loop();
+  }
+  else{
+    lop  = false;
+    noLoop();
+  }
 }
 
 void doTagCallouts(){
@@ -223,15 +232,6 @@ The backer   cannot advance if a tag is at T2 and no TAG is at TB0 ! wait on tag
 The backer   cannot advance if a tag is at TN and no label is at LB0 ! wait on labeller
 */
 
-
-boolean labelAtLB0(){
-  for (int i=0;i<lVec.length;i++){
-    if (lVec[i].nbSteps == config.LB0steps){
-      return true;
-    }
-  }
-  return false;
-}
 boolean tagAtTB0(){
   for (int i=0;i<tVec.length;i++){
     if (tVec[i].nbSteps == config.TB0steps){
@@ -264,6 +264,14 @@ boolean tagbetweenTB0andT2(){
   }
   return false;
 }
+boolean labelAtLB0(){
+  for (int i=0;i<lVec.length;i++){
+    if (lVec[i].nbSteps == config.LB0steps){
+      return true;
+    }
+  }
+  return false;
+}
 void printSpace(int n){
   for (int i=0;i<n;i++){
     print("-  ");
@@ -278,10 +286,12 @@ boolean taggerCanAdvance(){
   if (resNot && !blocked[0]){
     blocked[0] = resNot;
     println("Tagger blocked!");
+    doStop();
   }
   else if (!resNot && blocked[0]){
      blocked[0] = resNot;
      println("Tagger released!");
+     doStop();
   }
   return !resNot;
 }
@@ -296,12 +306,14 @@ boolean labellerCanAdvance(){
     //println("\t\tLabeller blocked!");
     printSpace(20);
     println("Labeller blocked!");
+    doStop();
   }
   else if (!resNot &&  blocked[1]){
     blocked[1] = resNot;
     //println("\t\tLabeller released.");
     printSpace(20);
     println("Labeller released.");
+    doStop();
   }
   return !resNot;
 }
@@ -317,18 +329,21 @@ boolean backerCanAdvance(){
     //println("\t\t\t\tBacker blocked on: TAGGER!");
     printSpace(40);
     println("Backer blocked on: TAGGER!");
+    doStop();
   }
   if (resNot1  && ! blocked[2]){
     blocked[2] = true;
     //println("\t\t\t\tBacker blocked on: LABELLER!");
     printSpace(40);
     println("Backer blocked on: LABELLER!");
+    doStop();
   }
   if (!resNot && blocked[2]){
     blocked[2] = resNot;
     //println("\t\t\t\tBacker released.");
     printSpace(40);
     println("Backer released.");
+    doStop();
   }
   return !resNot;
 } 
@@ -368,9 +383,8 @@ void draw(){
   }
   
 }
-Boolean lop =  true;
 
-void mouseClicked(){
+void pause(){
   if (lop){
     noLoop();
     lop  = false;
@@ -382,5 +396,29 @@ void mouseClicked(){
 }
 
 void keyPressed(){
-  mouseClicked();
+  /*
+        CALLOUTtags   = false,
+        CALLOUTlabels = false,
+        showSync      = false,
+        showBlocking  = false,
+        stopAtMessage = false;
+        */
+  if ((key == 'B') || (key == 'b')){
+    showBlocking = !showBlocking;
+  }
+  else  if ((key == 'L') || (key == 'l')){
+    CALLOUTlabels = !CALLOUTlabels;
+  }
+  else  if ((key == 'P') || (key == 'p')){
+    stopAtMessage = !stopAtMessage;
+  }
+  else  if ((key == 'S') || (key == 's')){
+    showSync = !showSync;
+  }
+  else  if ((key == 'T') || (key == 't')){
+    CALLOUTtags = !CALLOUTtags;
+  }
+  else{
+    pause();
+  }
 }

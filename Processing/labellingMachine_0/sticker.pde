@@ -19,13 +19,16 @@ class SyncLock{
       return;
     }
     //String ss = String.format("%2s", Integer.toBinaryString(syncBits)).replace(' ', '0'); //binary(syncBits)
-    String ss = binary(syncBits);
-    int ll = ss.length();
+    //String ss = binary(syncBits);
+    //int ll = ss.length();
     
     print("Sync:\t");
-    
+    print((syncBits >> 1 )& 1);
+    print("--");
+    println(syncBits & 1);
+    doStop();
     //println(ss);
-    println(ss.substring(ll-2,ll));
+    //println(ss.substring(ll-2,ll));
   }
 }
 
