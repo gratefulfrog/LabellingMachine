@@ -14,6 +14,11 @@ class SyncLock{
       syncBits &= masks[bit^1];
     }
   }
+  boolean isSynched(int bit){
+    // return true if the bit, i.e. the ID, is sync locked
+    return boolean(syncBits & masks[bit]);
+  }
+  
   void show(){
     if (!showSync){
       return;
@@ -62,7 +67,6 @@ class SimuSticker{
     stroke(col);
     fill(col);
     float x = nbSteps *conf.steps2Pixels;
-    //println(nbSteps-transitionStartSteps);
     pushMatrix();
     rotate(PI-conf.RA);
     rect(x,0,w -(nbSteps-transitionStartSteps)*conf.steps2Pixels,-h);
@@ -137,30 +141,36 @@ class Sticker extends Sticker_{
   }
       
   void doStep(boolean doAStep){
-    // check to see if it's time to flop down!
+    // check to see if it's time to transfer a sticker to the backer!
     if (!transitioning && (support == 1) && (nbSteps>=conf.TB0steps)){
       support = 1;
       transitioning = true;
       transitionStartSteps = nbSteps;
       backerStartSteps = conf.TB0steps;
-      sy.sync(id,true); 
-      sy.show();
+      if (!sy.isSynched(id)){
+        sy.sync(id,true); 
+        sy.show();
+      }
     }
     else if (!transitioning && (support == 2) && (nbSteps>=conf.LB0steps)){
       support = 2;
       transitioning = true;
       transitionStartSteps = nbSteps;
       backerStartSteps = conf.LB0steps;
-      sy.sync(id,true);
-      sy.show();
+      if (!sy.isSynched(id)){
+        sy.sync(id,true); 
+        sy.show();
+      }
     }
     else if ((id == 1 && transitioning && nbSteps > conf.TBsteps) || 
         (id == 0 && transitioning && nbSteps > conf.LBsteps)) {
           transitioning = false;
           support = 3;
-          sy.sync(id,false); 
-          sy.show();
-        }
+          if (sy.isSynched(id)){
+            sy.sync(id,false); 
+            sy.show();
+          }
+        }    
     updateSXSY();
     pushMatrix();
     translate(startX,startY);
