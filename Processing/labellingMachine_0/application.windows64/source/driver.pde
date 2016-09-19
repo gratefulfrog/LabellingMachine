@@ -17,9 +17,6 @@ class Driver{
   }
     
   void step(){
-   /* if (!canStep()){
-      return;
-    }*/
     if (lVec != null){
       for (int i = 0; i< lVec.length; i++){
         if (lVec[i].support == supportID){

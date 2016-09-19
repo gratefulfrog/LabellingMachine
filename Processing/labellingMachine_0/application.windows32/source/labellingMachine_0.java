@@ -30,25 +30,20 @@ Boolean lop =  true;
 
 Boolean blockAtRampEnd =  true;
 
-final int tagDelay = config.ITsteps,
+final int tagDelay   = config.ITsteps,
           labelDelay = config.ILLsteps;
-/*
-Tag   tag1           = new Tag(config,3,s),
-      tag2           = new Tag(config,3,s),
-      tag3           = new Tag(config,3,s);
 
+final int nbTags           = 12,
+          nbTagsOnBacker   = 8,
+          tagEndStep       = nbTagsOnBacker*config.BITsteps, 
+          nbLabels         = 9,
+          nbLabelsOnBacker = 5,
+          labelEndStep     = nbLabelsOnBacker*config.BITsteps;
 
-Label label1         = new Label(config,3,s),
-      label2         = new Label(config,3,s),
-      label3         = new Label(config,3,s);
-*/
+int minTSteps,
+    minLSteps;
 
-//*/
-final int nbTags =20;
-//Tag tVec[];
 Sticker tVec[];
-final int nbLabels =8;
-//Label lVec[];
 Sticker lVec[];
 
 Driver tagger,  
@@ -58,121 +53,36 @@ Driver tagger,
 boolean blocked[] = {false,false,false};
 
 /*
-void settings() {
+void settings() {  // not available in javascript !!
    size(config.windowWidth,config.windowHeight);
 }
 */
 public void setup(){
   
-  frameRate(config.frameRate);  // nb steps per second
+  frameRate(config.speed);  // nb steps per second
   background(0);
-  //tVec = new Tag[nbTags];
   tVec = new Sticker[nbTags];
   for (int i = 0; i< nbTags;i++){
-    tVec[i] =  new Sticker(config,1,s,true);  //Tag(config,1,s);
+    tVec[i] =  new Sticker(config,1,s,true);
     tVec[i].nbSteps = -(tagDelay +config.Tsteps)*(i+1);
   }
   int lbaseSteps =  config.LB0steps-1;
-  lVec = new Sticker[nbLabels];//Label[nbLabels];
+  lVec = new Sticker[nbLabels];
   for (int i = 0; i< nbLabels;i++){
-    lVec[i] =  new Sticker(config,2,s,false); //Label(config,2,s);
-    lVec[i].nbSteps = -(labelDelay+config.Lsteps) *(i+1);// + lbaseSteps;
+    lVec[i] =  new Sticker(config,2,s,false); 
+    lVec[i].nbSteps = -(labelDelay+config.Lsteps) *(i+1);
   }
+  minTSteps = minSteps(tVec);
+  minLSteps = minSteps(lVec);
+  
   tagger   = new Driver(1, s, tVec, null);
   labeller = new Driver(2, s, null, lVec);
   backer   = new Driver(3,s,tVec,lVec);
   setStopPoints();
 }
 
-//Tag updateTag(Tag t){
-public Sticker updateTag(Sticker t){
-  int nbTagsOnBacker = 7;
-   if (t.support == 3 && t.nbSteps>(15*tagDelay+config.TClearsteps)){ //*(nbTagsOnBacker)){
-    t = new Sticker(config,1,s,true); //Tag(config,1,s);
-    t.nbSteps = -(tagDelay+config.Tsteps)*(nbTags-nbTagsOnBacker);
-  }
-  return t;
-}
-//Label updateLabel(Label l){
-public Sticker updateLabel(Sticker l){
-  int nbLabelsOnBacker = 5;
-   if (l.support == 3 && l.nbSteps>(labelDelay+config.Lsteps)*(nbLabelsOnBacker)){
-    l = new Sticker(config,2,s,false); // Label(config,2,s);
-    l.nbSteps = -(labelDelay+config.Lsteps)*(nbLabels-nbLabelsOnBacker);
-  }
-  return l;
-}
 
-Boolean good2Label = false;
-
-public void doStop(){
-  if (!stopAtMessage){
-    lop  = true;
-    loop();
-  }
-  else{
-    lop  = false;
-    noLoop();
-  }
-}
-
-public void doTagCallouts(){
-  for( int i=0;i<nbTags;i++){
-    if (tVec[i].nbSteps == config.T0steps){
-      println("AT T0!");
-      doStop();
-    }
-    else if (tVec[i].nbSteps == config.T1steps){
-      println("AT T1!");
-      doStop();
-    }
-    else if (tVec[i].nbSteps == config.TB0steps){
-      println("AT TB0!");
-      doStop();
-    }
-    else if (tVec[i].nbSteps == config.TBsteps){
-      println("AT TB!");
-      doStop();
-    }
-   else if (tVec[i].nbSteps == config.T2steps){
-      println("AT T2!");
-      doStop();
-    }
-    else if (tVec[i].nbSteps == config.TNsteps){
-      println("AT TN!");
-      doStop();
-    }
-    else if (tVec[i].nbSteps == config.TClearsteps){
-      println("AT TClear!");
-      doStop();
-    }
-  }
-}
-public void doLabelCallouts(){
-  for( int i=0;i<nbLabels;i++){
-    if (lVec[i].nbSteps == config.L0steps){
-      println("AT L0!");
-      doStop();
-    }
-    else if (lVec[i].nbSteps == config.L1steps){
-      println("AT L1!");
-      doStop();
-    }
-    else if (lVec[i].nbSteps == config.LB0steps){
-      println("AT LB0!");
-      doStop();
-    }
-    else if (lVec[i].nbSteps == config.LBsteps){
-      println("AT LB!");
-      doStop();
-    }
-    else if (lVec[i].nbSteps == config.LClearsteps){
-      println("AT LClear!");
-      doStop();
-    }
-  }
-}
-
+/***************************** Blocking Rules *************************/
 /*
 Blocking rules:
 
@@ -183,8 +93,6 @@ if we set to blockAtRampEnd, then we use
 * TN-DAsteps instead of TN
 * T2-DAsteps instead of T2
 
-
-The following conditions may lead to Inter blocking!!!
 The labeller cannot advance if there is a label at LB0 and (there is not tag that at TN  OR  if the backer cannot advance). wait on backer
 The tagger   cannot advance if there is a tag at TB0  and (there is a tag having stepped s such that TB0 < s < T2  OR  if the backer cannot advance)! wait on backer 
 The backer   cannot advance if a tag is at T2 and no TAG is at TB0 ! wait on tagger
@@ -210,7 +118,6 @@ public void  setStopPoints(){
     backerTagWaitLabelPoint = config.TNsteps  - config.DAsteps;
   }
 }
-
 
 public boolean tagAtTB0(){
   for (int i=0;i<tVec.length;i++){
@@ -333,40 +240,27 @@ public boolean backerCanAdvance(){
   return !resNot;
 } 
 
+/***************************** END Blocking Rules *************************/
 
 public void draw(){
   background(0);
+  minTSteps = minSteps(tVec);
+  minLSteps = minSteps(lVec);
   platform.draw();
   labeller.stepOK = labellerCanAdvance();
   tagger.stepOK = taggerCanAdvance();
   backer.stepOK = backerCanAdvance();
   
-  //good2Label = good2Label || (tVec[0].support == 3 && tVec[0].nbSteps > (config.TNsteps- labelDelay -config.Lsteps -20)); //- config.LB0steps));
-  //if (good2Label){
-    //labeller.step();
-    /*
-  for (int i = 0; i< nbLabels;i++){
-    lVec[i].doStep();
-    lVec[i] = updateLabel(lVec[i]);
-  }
-  */
-  //}
   labeller.step();
   tagger.step();
   backer.step();
-  /*
-   for (int i = 0; i< nbTags;i++){
-    tVec[i].doStep();
-    tVec[i] = updateTag(tVec[i]);
-  }
-  */
+  
   if (CALLOUTtags){
     doTagCallouts();
   }
   if (CALLOUTlabels){
     doLabelCallouts();
   }
-  
 }
 
 public void pause(){
@@ -380,6 +274,101 @@ public void pause(){
   }
 }
 
+public int minSteps (Sticker v[]){
+  int res = 0,
+       nb = v.length;
+       
+  for (int i=0;i<nb;i++){
+    res = min(res,v[i].nbSteps);
+  }
+  return res;
+}
+
+public Sticker updateTag(Sticker t){
+  if ((t.support == 3) && (t.nbSteps > tagEndStep)) { 
+    t = new Sticker(config,1,s,true); 
+    t.nbSteps = minTSteps - (tagDelay+config.Tsteps);
+  }
+  return t;
+}
+
+public Sticker updateLabel(Sticker l){
+   if ((l.support == 3) && (l.nbSteps > labelEndStep)) { 
+    l = new Sticker(config,2,s,false);
+    l.nbSteps = minLSteps- (labelDelay+config.Lsteps);
+  }
+  return l;
+}
+
+public void doStop(){
+  if (!stopAtMessage){
+    lop  = true;
+    loop();
+  }
+  else{
+    lop  = false;
+    noLoop();
+  }
+}
+
+public void doTagCallouts(){
+  for( int i=0;i<nbTags;i++){
+    if (tVec[i].nbSteps == config.T0steps){
+      println("AT T0!");
+      doStop();
+    }
+    else if (tVec[i].nbSteps == config.T1steps){
+      println("AT T1!");
+      doStop();
+    }
+    else if (tVec[i].nbSteps == config.TB0steps){
+      println("AT TB0!");
+      doStop();
+    }
+    else if (tVec[i].nbSteps == config.TBsteps){
+      println("AT TB!");
+      doStop();
+    }
+   else if (tVec[i].nbSteps == config.T2steps){
+      println("AT T2!");
+      doStop();
+    }
+    else if (tVec[i].nbSteps == config.TNsteps){
+      println("AT TN!");
+      doStop();
+    }
+    else if (tVec[i].nbSteps == config.TClearsteps){
+      println("AT TClear!");
+      doStop();
+    }
+  }
+}
+public void doLabelCallouts(){
+  for( int i=0;i<nbLabels;i++){
+    if (lVec[i].nbSteps == config.L0steps){
+      println("AT L0!");
+      doStop();
+    }
+    else if (lVec[i].nbSteps == config.L1steps){
+      println("AT L1!");
+      doStop();
+    }
+    else if (lVec[i].nbSteps == config.LB0steps){
+      println("AT LB0!");
+      doStop();
+    }
+    else if (lVec[i].nbSteps == config.LBsteps){
+      println("AT LB!");
+      doStop();
+    }
+    else if (lVec[i].nbSteps == config.LClearsteps){
+      println("AT LClear!");
+      doStop();
+    }
+  }
+}
+
+
 public void keyPressed(){
   /*
         CALLOUTtags   = false,
@@ -388,8 +377,14 @@ public void keyPressed(){
         showBlocking  = false,
         stopAtMessage = false;
         */
-  if ((key == 'B') || (key == 'b')){
+  if ((key == 'A') || (key == 'a')){
+    config.setSpeed(true);
+  }
+  else if ((key == 'B') || (key == 'b')){
     showBlocking = !showBlocking;
+  }
+  else  if ((key == 'D') || (key == 'd')){
+    config.setSpeed(false);
   }
   else  if ((key == 'L') || (key == 'l')){
     CALLOUTlabels = !CALLOUTlabels;
@@ -417,7 +412,7 @@ class Config{
   final int windowWidth  = 1800,
             windowHeight = 300;
   
-  final int frameRate =50;
+  int speed = 50;
 
   // conversion factors
   final float mm2Pixels = windowWidth/900.0f;  // 2.0 so 10mm = 20 pixels
@@ -440,7 +435,8 @@ class Config{
             DS  = 300,
             RH  = 2,
             IL  = 5;
-  final float RA    = PI*(180-21)/180.0f, //PI- QUARTER_PI,
+  final float RAdegrees = 21,
+              RA = PI*(180-RAdegrees)/180.0f, //PI- QUARTER_PI,
               sinRA = sin(RA),
               cosRA = cos(RA),
               tanRA = tan(RA),
@@ -505,7 +501,7 @@ class Config{
   // Platform Dimensions in pixels
   final int baseLength          = round(810 * mm2Pixels),
             baseHeight          = 50,
-            rampHeight          = round(2 * mm2Pixels),
+            rampHeight          = round(RH * mm2Pixels),
             rampBaseLength      = round(106 * mm2Pixels),
             rampSlopeLength     = round(150 * mm2Pixels),
             tagBaseLeftOffset   = round(50 * mm2Pixels),
@@ -572,6 +568,11 @@ class Config{
 
 
   Config(){};
+  
+  public void setSpeed(boolean faster){
+    speed = round(faster ? speed*1.5f : speed * 0.5f);
+    frameRate(speed);
+  }
 }
 class Driver{
   int supportID;
@@ -592,9 +593,6 @@ class Driver{
   }
     
   public void step(){
-   /* if (!canStep()){
-      return;
-    }*/
     if (lVec != null){
       for (int i = 0; i< lVec.length; i++){
         if (lVec[i].support == supportID){
@@ -656,7 +654,7 @@ class Platform {
     }
     float markerLength = 2 * conf.markerLength,
           offsetX = markerLength * cos(conf.RA-PI/2.0f),
-          offsetY = markerLength * sin(conf.RA-PI/2.0f); //(3.14159*45/180);
+          offsetY = markerLength * sin(conf.RA-PI/2.0f); 
     // T1
     float x1 = conf.rampBaseLength,
           y1 = 0,
@@ -669,8 +667,8 @@ class Platform {
     text(s1,x2, y2);
     
     // T0
-          x1 = x1 + conf.cosRA*(DPpixels + Spixels); //cos(45*3.14159/180.0)*(DPpixels + Spixels);
-          y1 =  -conf.sinRA*(DPpixels + Spixels); //-sin(45*3.14159/180.0)*(DPpixels + Spixels);
+          x1 = x1 + conf.cosRA*(DPpixels + Spixels); 
+          y1 =  -conf.sinRA*(DPpixels + Spixels); 
           x2 = x1 + offsetX;
           y2 = y1 - offsetY;
     line (x1,
@@ -706,7 +704,7 @@ class Platform {
     text("TB",TBx, conf.markerLength);
     
     // T2
-    float T2x = TB0x + conf.BITpixels; //conf.rampBaseLength + conf.tagBaseLeftOffset + conf.T2pixels-conf.DPTpixels;
+    float T2x = TB0x + conf.BITpixels;
     line (T2x,
           0,
           T2x,
@@ -722,7 +720,7 @@ class Platform {
     text("TN",TNx, conf.markerLength);
     
     // TClear
-    float TClearx =TNx + conf.BITpixels;// conf.rampBaseLength + conf.tagBaseLeftOffset + conf.TClearpixels-conf.DPTpixels;
+    float TClearx =TNx + conf.BITpixels;
     line (TClearx,
           0,
           TClearx,
@@ -741,7 +739,7 @@ class Platform {
     //println(LB0x);
     // LB
     textAlign(RIGHT,TOP);
-    float LBx = LB0x + conf.Lpixels; // conf.rampBaseLength + conf.labelBaseLeftOffset + conf.LBpixels-conf.DPLpixels;
+    float LBx = LB0x + conf.Lpixels;
     line (LBx,
           0,
           LBx,
@@ -750,14 +748,13 @@ class Platform {
     //println(LBx);
     // LClear
     textAlign(LEFT,TOP);
-    float LClearx = LB0x + conf.BITpixels; // conf.rampBaseLength + conf.labelBaseLeftOffset + conf.LClearpixels-conf.DPLpixels;
+    float LClearx = LB0x + conf.BITpixels; 
     line (LClearx,
           0,
           LClearx,
           conf.markerLength);
     text("LClear",LClearx, conf.markerLength);
   }
-  
   
   public void draw(){
     pushMatrix();
@@ -797,17 +794,12 @@ class SyncLock{
     if (!showSync){
       return;
     }
-    //String ss = String.format("%2s", Integer.toBinaryString(syncBits)).replace(' ', '0'); //binary(syncBits)
-    //String ss = binary(syncBits);
-    //int ll = ss.length();
     
     print("Sync:\t");
     print((syncBits >> 1 )& 1);
     print("--");
     println(syncBits & 1);
     doStop();
-    //println(ss);
-    //println(ss.substring(ll-2,ll));
   }
 }
 
@@ -815,41 +807,52 @@ class SimuSticker{
   int col;
   float h,w;  // in pixels
   Config conf;
+  int transitionStartSteps, backerStartSteps;
+  boolean transitioning = false;  
   
   SimuSticker(float ww, float hh, int cc, Config c){
     h=hh;
     w=ww;
     col = cc;
     conf = c;
-    
-    //println(h);
-    //println(w);
   }
   public void doDraw (int nbSteps, int sup){
     stroke(col);
     fill(col);
     float x = nbSteps *conf.steps2Pixels;
     if (sup  !=3){
-      rotate(PI-conf.RA); // 45*3.14159/180.0);
+      rotate(PI-conf.RA); 
     }
     rect(x,0,w,-h);
   }
 
   public void doDrawTransition (int nbSteps, int sup){
-      stroke(col);
-      fill(col);
-      float x = nbSteps *conf.steps2Pixels;
-      if (sup  !=3){
-        rotate(PI-conf.RA); // 45*3.14159/180.0);
-      }
-      rect(x,0,w,-h);
+    float startX = conf.baseX - conf.Tpixels + conf.tagBaseLeftOffset + conf.rampBaseLength - conf.TB0pixels - conf.rampHeight/conf.tanRA,
+          startY = conf.baseY,
+          horizX = backerStartSteps+conf.Tsteps;
+    if(sup == 2){ // it's a label
+      startX = conf.baseX  - conf.Lpixels + conf.labelBaseLeftOffset + conf.rampBaseLength  - conf.LB0pixels - conf.rampHeight/conf.tanRA; 
+      startY = conf.baseY;
+      horizX = backerStartSteps+conf.Lsteps;
     }
+    stroke(col);
+    fill(col);
+    float x = nbSteps *conf.steps2Pixels;
+    //println(nbSteps-transitionStartSteps);
+    pushMatrix();
+    rotate(PI-conf.RA);
+    rect(x,0,w -(nbSteps-transitionStartSteps)*conf.steps2Pixels,-h);
+    popMatrix();
+    popMatrix();
+    pushMatrix();
+    translate(startX,startY);
+    rect(horizX*conf.steps2Pixels,0,(nbSteps-transitionStartSteps)*conf.steps2Pixels,-h);
+  }   
 }
 
 class Sticker_ extends SimuSticker{
   int nbSteps, id;
   int support;  // 1 is tag, 2 is label, 3 is base
-  boolean transitioning = false;
   SyncLock sy;
   
   Sticker_(int supp, float ww,float hh, int cc,int iDD, SyncLock syn, Config c){
@@ -893,7 +896,7 @@ class Sticker extends Sticker_{
         startY = conf.baseY -conf.rampHeight - (conf.Tpixels +conf.DPTpixels)*conf.rampSlopeSin;
       }
       else{
-        startX = conf.baseX - conf.Tpixels + conf.tagBaseLeftOffset + conf.rampBaseLength + conf.RXpixels;// conf.TB0pixels *conf.cosRA;
+        startX = conf.baseX - conf.Tpixels + conf.tagBaseLeftOffset + conf.rampBaseLength - conf.TB0pixels - conf.rampHeight/conf.tanRA; 
         startY = conf.baseY;
       }
     }
@@ -903,7 +906,7 @@ class Sticker extends Sticker_{
         startY = conf.baseY -conf.rampHeight - (conf.Lpixels +conf.DPLpixels)*conf.rampSlopeSin;
       }
       else{
-        startX = conf.baseX  + conf.labelBaseLeftOffset + conf.rampBaseLength - conf.Lpixels -conf.LB0pixels - conf.rampHeight/conf.tanRA; 
+        startX = conf.baseX  - conf.Lpixels + conf.labelBaseLeftOffset + conf.rampBaseLength  - conf.LB0pixels - conf.rampHeight/conf.tanRA; 
         startY = conf.baseY;
       }
     }
@@ -911,114 +914,37 @@ class Sticker extends Sticker_{
       
   public void doStep(boolean doAStep){
     // check to see if it's time to flop down!
-    if (support == 1 && nbSteps>conf.TB0steps){
-      support = 3;
+    if (!transitioning && (support == 1) && (nbSteps>=conf.TB0steps)){
+      support = 1;
       transitioning = true;
+      transitionStartSteps = nbSteps;
+      backerStartSteps = conf.TB0steps;
       sy.sync(id,true); 
       sy.show();
-      //println("Start of Tag transition: Tagger and Backer synched!");
     }
-    else if (support == 2 && nbSteps>conf.LB0steps){
-      support = 3;
+    else if (!transitioning && (support == 2) && (nbSteps>=conf.LB0steps)){
+      support = 2;
       transitioning = true;
+      transitionStartSteps = nbSteps;
+      backerStartSteps = conf.LB0steps;
       sy.sync(id,true);
       sy.show();
-     // println("Start of Label transition: Labeller and Backer synched!");
     }
-    updateSXSY();
-    if ((support ==3) && 
-       ((id == 1 && transitioning && nbSteps > conf.TBsteps) || 
-          (id == 0 && transitioning && nbSteps > conf.LBsteps))) {
+    else if ((id == 1 && transitioning && nbSteps > conf.TBsteps) || 
+        (id == 0 && transitioning && nbSteps > conf.LBsteps)) {
           transitioning = false;
+          support = 3;
           sy.sync(id,false); 
           sy.show();
-          //sy.show();
-         // println("End of Tag/label transition: TaggerLabeller and Backer synch released");
-          }
-    
+        }
+    updateSXSY();
     pushMatrix();
     translate(startX,startY);
     step(doAStep);
     popMatrix();
   }
 }
-/*
-class Tag extends Sticker_{
- float startX,
-       startY;
-      
-  Tag(Config c, int sup, SyncLock syn){
-    super(sup, c.Tpixels, c.THpixels, c.tagMarkerColor,c.steps2Pixels,1,syn,c);
-  }
-  void doStep(){
-    // check to see if it's time to flop down!
-    if (support == 1 && nbSteps>conf.TB0steps){
-      support = 3;
-      transitioning = true;
-      sy.sync(id,true); 
-      sy.show();
-      //println("Start of Tag transition: Tagger and Backer synched!");
-    }
-    if (support !=3){
-      startX = conf.baseX  + conf.tagBaseLeftOffset + conf.rampBaseLength + (conf.Tpixels +conf.DPTpixels)*conf.rampSlopeCos;
-      startY = conf.baseY -conf.rampHeight - (conf.Tpixels +conf.DPTpixels)*conf.rampSlopeSin;
-    }
-    else{
-      if (transitioning && nbSteps > conf.TBsteps){
-        transitioning = false;
-        sy.sync(id,false); 
-        sy.show();
-        //sy.show();
-       // println("End of Tag transition: Tagger and Backer synch released");
-      }
-      startX = conf.baseX - conf.Tpixels + conf.tagBaseLeftOffset + conf.rampBaseLength + conf.RXpixels;// conf.TB0pixels *conf.cosRA;
-      startY = conf.baseY;
-    }
-    pushMatrix();
-    translate(startX,startY);
-    step();
-    popMatrix();
-  }
-}  
 
-class Label extends Sticker_{
-  float startX,
-        startY;
- 
-  Label(Config c,int supp,SyncLock syn){
-    super(supp, c.Lpixels, c.LHpixels, c.labelMarkerColor,c.steps2Pixels,0,syn,c);
-  }
-  void doStep(){
-    // check to see if it's time to flop down!
-    if (support == 2 && nbSteps>conf.LB0steps){
-      support = 3;
-      transitioning = true;
-      sy.sync(id,true);
-      sy.show();
-     // println("Start of Label transition: Labeller and Backer synched!");
-    }
-    if (support !=3){
-      startX = conf.baseX + conf.labelBaseLeftOffset + conf.rampBaseLength + (conf.Lpixels +conf.DPLpixels)*conf.rampSlopeCos;
-      startY = conf.baseY -conf.rampHeight - (conf.Lpixels +conf.DPLpixels)*conf.rampSlopeSin;
-  }
-    else{
-      if (transitioning && nbSteps > conf.LBsteps){
-        //support = 3;
-        transitioning = false;
-        sy.sync(id,false); 
-        sy.show();
-        //  println("End of Label transition: Labeller and Backer synch released");
-      }
-      startX = conf.baseX  + conf.labelBaseLeftOffset + conf.rampBaseLength - conf.Lpixels -conf.LB0pixels - conf.rampHeight/conf.tanRA; //conf.baseX - conf.Lpixels + conf.labelBaseLeftOffset + conf.rampBaseLength + conf.LB0pixels *conf.cosRA;; // conf.baseX - conf.Lpixels + conf.labelBaseLeftOffset + conf.rampBaseLength + conf.LB0pixels *conf.cosRA; 
-      startY = conf.baseY;
-    }
-    pushMatrix();
-    translate(startX,startY);
-    step();
-    popMatrix();
-  }
-}
-*/
   public void settings() {  size(1800,300); }
   static public void main(String[] passedArgs) {
     String[] appletArgs = new String[] { "labellingMachine_0" };

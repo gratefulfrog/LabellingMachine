@@ -39,7 +39,7 @@ class Platform {
     }
     float markerLength = 2 * conf.markerLength,
           offsetX = markerLength * cos(conf.RA-PI/2.0),
-          offsetY = markerLength * sin(conf.RA-PI/2.0); //(3.14159*45/180);
+          offsetY = markerLength * sin(conf.RA-PI/2.0); 
     // T1
     float x1 = conf.rampBaseLength,
           y1 = 0,
@@ -52,8 +52,8 @@ class Platform {
     text(s1,x2, y2);
     
     // T0
-          x1 = x1 + conf.cosRA*(DPpixels + Spixels); //cos(45*3.14159/180.0)*(DPpixels + Spixels);
-          y1 =  -conf.sinRA*(DPpixels + Spixels); //-sin(45*3.14159/180.0)*(DPpixels + Spixels);
+          x1 = x1 + conf.cosRA*(DPpixels + Spixels); 
+          y1 =  -conf.sinRA*(DPpixels + Spixels); 
           x2 = x1 + offsetX;
           y2 = y1 - offsetY;
     line (x1,
@@ -89,7 +89,7 @@ class Platform {
     text("TB",TBx, conf.markerLength);
     
     // T2
-    float T2x = TB0x + conf.BITpixels; //conf.rampBaseLength + conf.tagBaseLeftOffset + conf.T2pixels-conf.DPTpixels;
+    float T2x = TB0x + conf.BITpixels;
     line (T2x,
           0,
           T2x,
@@ -105,7 +105,7 @@ class Platform {
     text("TN",TNx, conf.markerLength);
     
     // TClear
-    float TClearx =TNx + conf.BITpixels;// conf.rampBaseLength + conf.tagBaseLeftOffset + conf.TClearpixels-conf.DPTpixels;
+    float TClearx =TNx + conf.BITpixels;
     line (TClearx,
           0,
           TClearx,
@@ -124,7 +124,7 @@ class Platform {
     //println(LB0x);
     // LB
     textAlign(RIGHT,TOP);
-    float LBx = LB0x + conf.Lpixels; // conf.rampBaseLength + conf.labelBaseLeftOffset + conf.LBpixels-conf.DPLpixels;
+    float LBx = LB0x + conf.Lpixels;
     line (LBx,
           0,
           LBx,
@@ -133,14 +133,13 @@ class Platform {
     //println(LBx);
     // LClear
     textAlign(LEFT,TOP);
-    float LClearx = LB0x + conf.BITpixels; // conf.rampBaseLength + conf.labelBaseLeftOffset + conf.LClearpixels-conf.DPLpixels;
+    float LClearx = LB0x + conf.BITpixels; 
     line (LClearx,
           0,
           LClearx,
           conf.markerLength);
     text("LClear",LClearx, conf.markerLength);
   }
-  
   
   void draw(){
     pushMatrix();
