@@ -64,13 +64,13 @@ class SimuSticker{
     }
 }
 
-class Sticker extends SimuSticker{
+class Sticker_ extends SimuSticker{
   int nbSteps, id;
-  int support;  // 0 is tag, 1 is label, 3 is base
+  int support;  // 1 is tag, 2 is label, 3 is base
   boolean transitioning = false;
   SyncLock sy;
   
-  Sticker(int supp, float ww,float hh, color cc, float ss2PP, int iDD, SyncLock syn, Config c){
+  Sticker_(int supp, float ww,float hh, color cc,int iDD, SyncLock syn, Config c){
     super(ww,hh,cc,c);
     id = iDD;
     support = supp;
@@ -78,8 +78,10 @@ class Sticker extends SimuSticker{
     sy = syn;
   }
   
-  void step(){
-    nbSteps++;
+  void step(boolean doAStep){
+    if (doAStep) {
+      nbSteps++;
+    }
     if (!transitioning){
       doDraw(nbSteps,support);
     }
@@ -89,15 +91,82 @@ class Sticker extends SimuSticker{
   }
 }
 
-
-class Tag extends Sticker{
+class Sticker extends Sticker_{
  float startX,
        startY;
- Config conf;
+      
+  Sticker(Config c, int sup, SyncLock syn, boolean isTag){
+    super(sup, 
+          isTag ? c.Tpixels        :c.Lpixels, 
+          isTag ? c.THpixels       : c.LHpixels, 
+          isTag ? c.tagMarkerColor : c.labelMarkerColor,
+          isTag ? 1                : 0,
+          syn,
+          c);
+  }
+  void updateSXSY(){
+    if (id == 1) { // it's a tag
+      if (support !=3){
+        startX = conf.baseX  + conf.tagBaseLeftOffset + conf.rampBaseLength + (conf.Tpixels +conf.DPTpixels)*conf.rampSlopeCos;
+        startY = conf.baseY -conf.rampHeight - (conf.Tpixels +conf.DPTpixels)*conf.rampSlopeSin;
+      }
+      else{
+        startX = conf.baseX - conf.Tpixels + conf.tagBaseLeftOffset + conf.rampBaseLength + conf.RXpixels;// conf.TB0pixels *conf.cosRA;
+        startY = conf.baseY;
+      }
+    }
+    else{  // it's a label
+      if (support !=3){
+        startX = conf.baseX + conf.labelBaseLeftOffset + conf.rampBaseLength + (conf.Lpixels +conf.DPLpixels)*conf.rampSlopeCos;
+        startY = conf.baseY -conf.rampHeight - (conf.Lpixels +conf.DPLpixels)*conf.rampSlopeSin;
+      }
+      else{
+        startX = conf.baseX  + conf.labelBaseLeftOffset + conf.rampBaseLength - conf.Lpixels -conf.LB0pixels - conf.rampHeight/conf.tanRA; 
+        startY = conf.baseY;
+      }
+    }
+  }
+      
+  void doStep(boolean doAStep){
+    // check to see if it's time to flop down!
+    if (support == 1 && nbSteps>conf.TB0steps){
+      support = 3;
+      transitioning = true;
+      sy.sync(id,true); 
+      sy.show();
+      //println("Start of Tag transition: Tagger and Backer synched!");
+    }
+    else if (support == 2 && nbSteps>conf.LB0steps){
+      support = 3;
+      transitioning = true;
+      sy.sync(id,true);
+      sy.show();
+     // println("Start of Label transition: Labeller and Backer synched!");
+    }
+    updateSXSY();
+    if ((support ==3) && 
+       ((id == 1 && transitioning && nbSteps > conf.TBsteps) || 
+          (id == 0 && transitioning && nbSteps > conf.LBsteps))) {
+          transitioning = false;
+          sy.sync(id,false); 
+          sy.show();
+          //sy.show();
+         // println("End of Tag/label transition: TaggerLabeller and Backer synch released");
+          }
+    
+    pushMatrix();
+    translate(startX,startY);
+    step(doAStep);
+    popMatrix();
+  }
+}
+/*
+class Tag extends Sticker_{
+ float startX,
+       startY;
       
   Tag(Config c, int sup, SyncLock syn){
     super(sup, c.Tpixels, c.THpixels, c.tagMarkerColor,c.steps2Pixels,1,syn,c);
-    conf = c;
   }
   void doStep(){
     // check to see if it's time to flop down!
@@ -130,7 +199,7 @@ class Tag extends Sticker{
   }
 }  
 
-class Label extends Sticker{
+class Label extends Sticker_{
   float startX,
         startY;
  
@@ -167,3 +236,4 @@ class Label extends Sticker{
     popMatrix();
   }
 }
+*/

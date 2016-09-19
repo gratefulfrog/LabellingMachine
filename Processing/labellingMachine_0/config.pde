@@ -5,7 +5,7 @@ class Config{
   final int windowWidth  = 1800,
             windowHeight = 300;
   
-  final int frameRate =200;
+  final int frameRate =100;
 
   // conversion factors
   final float mm2Pixels = windowWidth/900.0;  // 2.0 so 10mm = 20 pixels

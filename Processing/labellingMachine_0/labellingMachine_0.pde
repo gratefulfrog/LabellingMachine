@@ -2,14 +2,16 @@
 final Config config = new Config();
 Platform platform   = new Platform(config);
 
-SyncLock s = new SyncLock();
+SyncLock s = new SyncLock();  
 
-Boolean CALLOUT =   false,
-        showSync = false;
+Boolean CALLOUTtags   = false,
+        CALLOUTlabels = false,
+        showSync      = false,
+        showBlocking  = false;
 
 final int tagDelay = config.ITsteps,
           labelDelay = config.ILLsteps;
-
+/*
 Tag   tag1           = new Tag(config,3,s),
       tag2           = new Tag(config,3,s),
       tag3           = new Tag(config,3,s);
@@ -18,13 +20,19 @@ Tag   tag1           = new Tag(config,3,s),
 Label label1         = new Label(config,3,s),
       label2         = new Label(config,3,s),
       label3         = new Label(config,3,s);
-
+*/
 
 //*/
 final int nbTags =20;
-Tag tVec[];
+//Tag tVec[];
+Sticker tVec[];
 final int nbLabels =8;
-Label lVec[];
+//Label lVec[];
+Sticker lVec[];
+
+Driver tagger,  
+       labeller,
+       backer;
 
 /*
 void settings() {
@@ -35,19 +43,22 @@ void setup(){
   size(1800,300);
   frameRate(config.frameRate);  // nb steps per second
   background(0);
-  tVec = new Tag[nbTags];
-  //tVec[0] = tag1;
-  //tVec[1] = tag2;
+  //tVec = new Tag[nbTags];
+  tVec = new Sticker[nbTags];
   for (int i = 0; i< nbTags;i++){
-    tVec[i] =  new Tag(config,1,s);
+    tVec[i] =  new Sticker(config,1,s,true);  //Tag(config,1,s);
     tVec[i].nbSteps = -(tagDelay +config.Tsteps)*(i+1);
   }
   int lbaseSteps =  config.LB0steps-1;
-  lVec = new Label[nbLabels];
+  lVec = new Sticker[nbLabels];//Label[nbLabels];
   for (int i = 0; i< nbLabels;i++){
-    lVec[i] =  new Label(config,2,s);
+    lVec[i] =  new Sticker(config,2,s,false); //Label(config,2,s);
     lVec[i].nbSteps = -(labelDelay+config.Lsteps) *(i+1);// + lbaseSteps;
   }
+  tagger   = new Driver(1, s, tVec, null);
+  labeller = new Driver(2, s, null, lVec);
+  backer   = new Driver(3,s,tVec,lVec);
+  //tagger.stepOK = false;
   /*
   String ss = binary(s.syncBits);
   int ll = ss.length();
@@ -119,18 +130,20 @@ void setup(){
   
 }
 
-Tag updateTag(Tag t){
-  int nbTagsOnBacker = 15;
-   if (t.support == 3 && t.nbSteps>(tagDelay+config.Tsteps)*(nbTagsOnBacker)){
-    t = new Tag(config,1,s);
+//Tag updateTag(Tag t){
+Sticker updateTag(Sticker t){
+  int nbTagsOnBacker = 7;
+   if (t.support == 3 && t.nbSteps>(15*tagDelay+config.TClearsteps)){ //*(nbTagsOnBacker)){
+    t = new Sticker(config,1,s,true); //Tag(config,1,s);
     t.nbSteps = -(tagDelay+config.Tsteps)*(nbTags-nbTagsOnBacker);
   }
   return t;
 }
-Label updateLabel(Label l){
+//Label updateLabel(Label l){
+Sticker updateLabel(Sticker l){
   int nbLabelsOnBacker = 5;
    if (l.support == 3 && l.nbSteps>(labelDelay+config.Lsteps)*(nbLabelsOnBacker)){
-    l = new Label(config,2,s);
+    l = new Sticker(config,2,s,false); // Label(config,2,s);
     l.nbSteps = -(labelDelay+config.Lsteps)*(nbLabels-nbLabelsOnBacker);
   }
   return l;
@@ -174,6 +187,8 @@ void doTagCallouts(){
       doStop();
     }
   }
+}
+void doLabelCallouts(){
   for( int i=0;i<nbLabels;i++){
     if (lVec[i].nbSteps == config.L0steps){
       println("AT L0!");
@@ -198,23 +213,127 @@ void doTagCallouts(){
   }
 }
 
+/*
+The following conditions may lead to Inter blocking!!!
+The labeller cannot advance if there is a label at LB0 and (there is not tag that at TN  OR  if the backer cannot advance). wait on backer
+The tagger   cannot advance if there is a tag at TB0  and (there is a tag having stepped s such that TB0 < s < T2  OR  if the backer cannot advance)! wait on backer 
+The backer   cannot advance if a tag is at T2 and no TAG is at TB0 ! wait on tagger
+The backer   cannot advance if a tag is at TN and no label is at LB0 ! wait on labeller
+*/
+
+boolean backerCanAdvance(){
+  boolean resNot0 = (tagAtT2() && ! tagAtTB0()),
+          resNot1 = (tagAtTN() && ! labelAtLB0()),
+          resNot = resNot0 || resNot1;
+  if (!showBlocking){
+    return !resNot;
+  }
+  if (resNot0){
+    println("\t\t\t\tBacker blocked on: TAGGER!");
+  }
+  if (resNot1){
+    println("\t\t\t\t\t\tBacker blocked on: LABELLER!");
+  }
+  return !resNot;
+}
+  
+
+boolean labelAtLB0(){
+  for (int i=0;i<lVec.length;i++){
+    if (lVec[i].nbSteps == config.LB0steps){
+      return true;
+    }
+  }
+  return false;
+}
+ 
+boolean labellerCanAdvance(){
+  boolean resNot = (labelAtLB0() && (!backerCanAdvance() || ! tagAtTN()));
+  if (!showBlocking){
+    return !resNot;
+  }
+  if (resNot){
+    println("\t\tLabeller blocked!");
+  }
+  return !resNot;
+}
+
+boolean tagAtTB0(){
+  for (int i=0;i<tVec.length;i++){
+    if (tVec[i].nbSteps == config.TB0steps){
+      return true;
+    }
+  }
+  return false;
+}
+boolean tagAtT2(){
+  for (int i=0;i<tVec.length;i++){
+    if (tVec[i].nbSteps == config.T2steps){
+      return true;
+    }
+  }
+  return false;
+}
+boolean tagAtTN(){
+  for (int i=0;i<tVec.length;i++){
+    if (tVec[i].nbSteps == config.TNsteps){
+      return true;
+    }
+  }
+  return false;
+}
+boolean tagbetweenTB0andT2(){
+  for (int i=0;i<tVec.length;i++){
+    if ((tVec[i].nbSteps > config.TB0steps) && (tVec[i].nbSteps < config.T2steps)){
+      return true;
+    }
+  }
+  return false;
+}
+
+boolean taggerCanAdvance(){
+  boolean resNot = (tagAtTB0() && (!backerCanAdvance() || tagbetweenTB0andT2()));
+  if (!showBlocking){
+    return !resNot;
+  }
+  if (resNot){
+    println("Tagger blocked!");
+  }
+  return !resNot;
+}
+
+
 void draw(){
   background(0);
   platform.draw();
+  labeller.stepOK = labellerCanAdvance();
+  tagger.stepOK = taggerCanAdvance();
+  backer.stepOK = backerCanAdvance();
   
-  good2Label = good2Label || (tVec[0].support == 3 && tVec[0].nbSteps > (config.TNsteps- labelDelay -config.Lsteps -20)); //- config.LB0steps));
-  if (good2Label){
+  //good2Label = good2Label || (tVec[0].support == 3 && tVec[0].nbSteps > (config.TNsteps- labelDelay -config.Lsteps -20)); //- config.LB0steps));
+  //if (good2Label){
+    //labeller.step();
+    /*
   for (int i = 0; i< nbLabels;i++){
     lVec[i].doStep();
     lVec[i] = updateLabel(lVec[i]);
   }
-  }
+  */
+  //}
+  labeller.step();
+  tagger.step();
+  backer.step();
+  /*
    for (int i = 0; i< nbTags;i++){
     tVec[i].doStep();
     tVec[i] = updateTag(tVec[i]);
   }
-  if (CALLOUT){
+  */
+  if (CALLOUTtags){
     doTagCallouts();
+  }
+  if (CALLOUTlabels){
+    doLabelCallouts();
   }
   
 }
