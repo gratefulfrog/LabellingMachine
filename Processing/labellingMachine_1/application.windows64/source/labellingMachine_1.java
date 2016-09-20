@@ -19,9 +19,6 @@ BlockingMgr bM;
 SimuMgr sM;
 SyncLock sy;  
 App app;
-Driver tagger,  
-       labeller,
-       backer;
 
 public void setup(){
    // config.windowWidth, config.windowHeight MUST be the same numbers !!!!
