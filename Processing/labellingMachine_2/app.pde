@@ -241,25 +241,61 @@ class App{
   BlockingMgr bM;
   SimuMgr sM;
   SyncLock sy;  
+  CommsMgr cMgr;
        
-  App(Config c, BlockingMgr b, SimuMgr smm, SyncLock syy){
+  App(Config c, BlockingMgr b, SimuMgr smm, SyncLock syy, CommsMgr cm){
     config = c;
     bM = b;
     sM = smm;
     sy = syy;
+    cMgr = cm;
     tagger   = new Driver(1, sy, config, bM, sM);
-    labeller = new Driver(2, sy, config,  bM, sM);
+    labeller = new Driver(2, sy, config, bM, sM);
     backer   = new Driver(3, sy, config, bM, sM);
      if (isSimulation){
       bM.setStopPoints(sM.blockAtRamp);
      }
   }
   
+  void clearLastLTPair(){
+    println("Clearing a pair");
+    if (sM.lVec.size()>0){
+      sM.lVec.remove(0);
+    }
+    if(sM.tVec.size()>0){
+      sM.tVec.remove(0);
+    }
+  }
+  
+  void endOfSpoolDetected(){
+    println("End Of Spool Detected!");
+  }
+  
+  void jamDetected(){
+    println("Jam Detected!");
+  }
+  
   void updateMachineState(){
-    // placeholder for pudating from serial port
-    labeller.stepOK = true;
-    tagger.stepOK   = true;
-    backer.stepOK   = true;
+    int curr = cMgr.interpretIncomingByte();
+    
+    backer.stepOK   = boolean(curr & (1<<0));
+    labeller.stepOK = boolean(curr & (1<<1));
+    tagger.stepOK   = boolean(curr & (1<<2));
+    if (boolean(curr & (1<<3))){
+      clearLastLTPair();
+    }
+    if (boolean(curr & (1<<4))){
+      sM.lVec.add(new Sticker(config,2,sy,false));
+    }
+    if (boolean(curr & (1<<5))){
+      sM.tVec.add(new Sticker(config,1,sy,true));
+    }
+    if (boolean(curr & (1<<6))){
+      endOfSpoolDetected();
+    }
+     if (boolean(curr & (1<<7))){
+      jamDetected();
+    }
   }
     
   void draw(){
