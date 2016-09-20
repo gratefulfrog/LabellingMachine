@@ -1,6 +1,6 @@
 class Platform {
-  final Config  conf;
-  Platform(final Config  c){
+  Config  conf;
+  Platform(Config  c){
     conf = c;
   }
   

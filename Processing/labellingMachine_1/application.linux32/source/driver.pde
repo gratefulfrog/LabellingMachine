@@ -1,5 +1,5 @@
 class BlockingMgr{
-   final Config conf;
+   Config conf;
    
    int labellerStopPoint,
       taggerStopPoint,
@@ -10,7 +10,7 @@ class BlockingMgr{
     boolean blocked[] = {false,false,false},  // for blocking rules
           atRampEnd = true;  // for blocking point control
           
-  BlockingMgr(final Config c){
+  BlockingMgr(Config c){
     conf = c;
     setStopPoints(atRampEnd);
   } 
@@ -36,18 +36,20 @@ class BlockingMgr{
 class Driver{
   int supportID;
   SyncLock syn;
+  SimuMgr sm;
   boolean stepOK = true;
   Sticker tVec[],  // may be null
           lVec[];  // may be null
-  final Config  conf;  
+  Config  conf;  
   BlockingMgr bMgr;
   
-  Driver(int iDD, SyncLock s, final Config  confi, BlockingMgr b, Sticker[] tags, Sticker[] labels){
+  Driver(int iDD, SyncLock s, Config  confi, BlockingMgr b, SimuMgr smm){ //Sticker[] tags, Sticker[] labels){
     conf      = confi;
     syn       = s;
     bMgr      = b;
-    tVec      = tags;
-    lVec      = labels;
+    sm        = smm;
+    tVec      = sm.tVec;
+    lVec      = sm.lVec;
     supportID = iDD;  // 1: tagger, 2: Labeller, 3 backer
   }
   
@@ -129,18 +131,18 @@ class Driver{
   
   boolean taggerCanAdvance(){
     boolean resNot = (tagAtTB0() && (!backerCanAdvance() || tagbetweenTB0andT2()));
-    if (!showBlocking){
+    if (!sm.showBlocking){
       return !resNot;
     }
     if (resNot && !bMgr.blocked[0]){
       bMgr.blocked[0] = resNot;
       println("Tagger blocked!");
-      doStop();
+      sm.doStop();
     }
     else if (!resNot && bMgr.blocked[0]){
        bMgr.blocked[0] = resNot;
        println("Tagger released!");
-       doStop();
+       sm.doStop();
     }
     return !resNot;
   }
@@ -150,20 +152,20 @@ class Driver{
     // there is a label at LB0 and (there is not tag that at TN)  OR there is a lable l with steps s such that LB0 < s < LB OR  if the backer cannot advance). wait on backer
   
     boolean resNot = (labelAtLB0() && (!tagAtTN() || labebetweenLB0andLB() || !backerCanAdvance()));
-    if (!showBlocking){
+    if (!sm.showBlocking){
       return !resNot;
     }
     if (resNot && !bMgr.blocked[1]){
       bMgr.blocked[1] = resNot;
       printSpace(20);
       println("Labeller blocked!");
-      doStop();
+      sm.doStop();
     }
     else if (!resNot &&  bMgr.blocked[1]){
       bMgr.blocked[1] = resNot;
       printSpace(20);
       println("Labeller released.");
-      doStop();
+      sm.doStop();
     }
     return !resNot;
   }
@@ -175,7 +177,7 @@ class Driver{
     boolean resNot0 = (tagAtT2() && (!tagAtTB0())),
             resNot1 = (tagAtTN() && (!labelAtLB0())),
             resNot = resNot0 || resNot1;
-    if (!showBlocking){
+    if (!sm.showBlocking){
       return !resNot;
     }
     if (resNot0 && ! bMgr.blocked[2]){
@@ -183,21 +185,21 @@ class Driver{
       //println("\t\t\t\tBacker blocked on: TAGGER!");
       printSpace(40);
       println("Backer blocked on: TAGGER!");
-      doStop();
+      sm.doStop();
     }
     if (resNot1  && ! bMgr.blocked[2]){
       bMgr.blocked[2] = true;
       //println("\t\t\t\tBacker blocked on: LABELLER!");
       printSpace(40);
       println("Backer blocked on: LABELLER!");
-      doStop();
+      sm.doStop();
     }
     if (!resNot && bMgr.blocked[2]){
       bMgr.blocked[2] = resNot;
       //println("\t\t\t\tBacker released.");
       printSpace(40);
       println("Backer released.");
-      doStop();
+      sm.doStop();
     }
     return !resNot;
   } 
@@ -221,7 +223,7 @@ class Driver{
       for (int i = 0; i< lVec.length; i++){
         if (lVec[i].support == supportID){
           lVec[i].doStep(stepOK);
-          lVec[i] = updateLabel(lVec[i]);
+          lVec[i] = sm.updateLabel(lVec[i]);
         }
       }
     }
@@ -229,7 +231,7 @@ class Driver{
       for (int i = 0; i< tVec.length;i++){
         if (tVec[i].support == supportID){
           tVec[i].doStep(stepOK);
-          tVec[i] = updateTag(tVec[i]);
+          tVec[i] = sm.updateTag(tVec[i]);
         }
       }
     }

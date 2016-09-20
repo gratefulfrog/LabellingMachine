@@ -5,6 +5,7 @@ class Config{
   final int windowWidth  = 1800,
             windowHeight = 300;
   
+ 
   int speed = 100;
 
   // conversion factors
@@ -165,7 +166,9 @@ class Config{
   /******** END Simulation Variables part 1**************/
 
 
-  Config(){};
+  Config(){
+  
+  };
   
   void setSpeed(boolean faster){
     speed = round(faster ? speed*1.5 : speed * 0.5);

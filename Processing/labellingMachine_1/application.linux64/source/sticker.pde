@@ -1,9 +1,14 @@
 class SyncLock{
   int masks[] = {1,2};
+  SimuMgr sM;
       
   int syncBits;
   SyncLock(){
+    sM = null;
     syncBits = 0;
+  }
+  void  postInstanciation(SimuMgr s){
+    sM = s;
   }
   
   void sync(int bit,boolean onOff){
@@ -20,7 +25,7 @@ class SyncLock{
   }
   
   void show(){
-    if (!showSync){
+    if (!sM.showSync){
       return;
     }
     
@@ -28,18 +33,18 @@ class SyncLock{
     print((syncBits >> 1 )& 1);
     print("--");
     println(syncBits & 1);
-    doStop();
+    sM.doStop();
   }
 }
 
 class SimuSticker{
   color col;
   float h,w;  // in pixels
-  final Config  conf;
+  Config  conf;
   int transitionStartSteps, backerStartSteps;
   boolean transitioning = false;  
   
-  SimuSticker(float ww, float hh, color cc, final Config  c){
+  SimuSticker(float ww, float hh, color cc, Config  c){
     h=hh;
     w=ww;
     col = cc;
@@ -83,7 +88,7 @@ class Sticker_ extends SimuSticker{
   int support;  // 1 is tag, 2 is label, 3 is base
   SyncLock sy;
   
-  Sticker_(int supp, float ww,float hh, color cc,int iDD, SyncLock syn, final Config  c){
+  Sticker_(int supp, float ww,float hh, color cc,int iDD, SyncLock syn, Config  c){
     super(ww,hh,cc,c);
     id = iDD;
     support = supp;
@@ -108,7 +113,7 @@ class Sticker extends Sticker_{
  float startX,
        startY;
       
-  Sticker(final Config  c, int sup, SyncLock syn, boolean isTag){
+  Sticker(Config  c, int sup, SyncLock syn, boolean isTag){
     super(sup, 
           isTag ? c.Tpixels        :c.Lpixels, 
           isTag ? c.THpixels       : c.LHpixels, 

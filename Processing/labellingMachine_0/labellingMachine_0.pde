@@ -1,8 +1,17 @@
 
 final Config config = new Config();
-Platform platform   = new Platform(config);
+BlockingMgr bM = new BlockingMgr(config);
 
 SyncLock s = new SyncLock();  
+Sticker tVec[];
+Sticker lVec[];
+
+Driver tagger,  
+       labeller,
+       backer;
+
+/****************** SIMULATION VARIABLES **********************/
+final Platform platform   = new Platform(config);
 
 Boolean CALLOUTtags   = false,
         CALLOUTlabels = false,
@@ -10,11 +19,11 @@ Boolean CALLOUTtags   = false,
         showBlocking  = false,
         stopAtMessage = false;
 
-Boolean lop =  true;
+Boolean lop         =  true,  // loop control
+        blockAtRamp =  true;  // sticker block point control
 
-Boolean blockAtRampEnd =  true;
-
-final int tagDelay   = config.ITsteps,
+// to control spacing of stickers 
+final int tagDelay   = config.ITsteps, 
           labelDelay = config.ILLsteps;
 
 final int nbTags           = 12,
@@ -24,17 +33,11 @@ final int nbTags           = 12,
           nbLabelsOnBacker = 5,
           labelEndStep     = nbLabelsOnBacker*config.BITsteps;
 
-int minTSteps,
+// to control recycling of stickers
+int minTSteps,  
     minLSteps;
 
-Sticker tVec[];
-Sticker lVec[];
-
-Driver tagger,  
-       labeller,
-       backer;
-
-boolean blocked[] = {false,false,false};
+/****************** END SIMULATION VARIABLES **********************/
 
 /*
 void settings() {  // not available in javascript !!
@@ -43,221 +46,48 @@ void settings() {  // not available in javascript !!
 */
 void setup(){
   size(1800,300);
-  frameRate(config.speed);  // nb steps per second
+  frameRate(config.speed);  // nb frames or steps per second
   background(0);
+  
   tVec = new Sticker[nbTags];
   for (int i = 0; i< nbTags;i++){
     tVec[i] =  new Sticker(config,1,s,true);
     tVec[i].nbSteps = -(tagDelay +config.Tsteps)*(i+1) +( i==0 ? 0 : -1)*round(random(-config.ITesteps,config.ITesteps)); //+ round(random(-config.ITesteps,config.ITesteps));
   }
-  int lbaseSteps =  config.LB0steps-1;
+  
   lVec = new Sticker[nbLabels];
   for (int i = 0; i< nbLabels;i++){
     lVec[i] =  new Sticker(config,2,s,false); 
     lVec[i].nbSteps = -(labelDelay+config.Lsteps) *(i+1) + ( i==0 ? 0 : -1)*round(random(-config.ILLesteps,config.ILLesteps));
   }
+  
+  // For sticker recycling (simulation only)
   minTSteps = minSteps(tVec);
   minLSteps = minSteps(lVec);
   
-  tagger   = new Driver(1, s, tVec, null);
-  labeller = new Driver(2, s, null, lVec);
-  backer   = new Driver(3,s,tVec,lVec);
-  setStopPoints();
+  tagger   = new Driver(1, s, config, bM, tVec, lVec);
+  labeller = new Driver(2, s, config,  bM, tVec, lVec);
+  backer   = new Driver(3,s, config, bM, tVec,lVec);
+  bM.setStopPoints(blockAtRamp);
 }
-
-
-/***************************** Blocking Rules *************************/
-/*
-Blocking rules:
-
-if we set to blockAtRampEnd, then we use 
-* T0 instead of TB0 in 1st condition tagger rule,
-* still use TB0 in second condition of tagger rule.
-* L0 instead of LB0 in labeller rule
-* TN-DAsteps instead of TN
-* T2-DAsteps instead of T2
-
-The labeller cannot advance if there is a label at LB0 and (there is not tag that at TN  OR there is a lable l such that LB0 < l < LB OR  if the backer cannot advance). wait on backer
-The tagger   cannot advance if there is a tag at TB0  and (there is a tag having stepped s such that TB0 < s < T2  OR  if the backer cannot advance)! wait on backer 
-The backer   cannot advance if a tag is at T2 and (no TAG is at TB0 ) wait on tagger
-The backer   cannot advance if a tag is at TN and (no label is at LB0)  wait on labeller
-*/
-
-int labellerStopPoint = config.LB0steps,
-    taggerStopPoint   = config.TB0steps,
-    backerTagWaitTagPoint = config.T2steps,    
-    backerTagWaitLabelPoint = config.TNsteps,
-    backerLabelReleasePoint = config.LBsteps;
-
-void  setStopPoints(){
-  if(!blockAtRampEnd){
-    labellerStopPoint       = config.LB0steps;
-    taggerStopPoint         = config.TB0steps;
-    backerTagWaitTagPoint   = config.T2steps;    
-    backerTagWaitLabelPoint = config.TNsteps;
-    backerLabelReleasePoint = config.LBsteps;
-  }
-  else {
-    labellerStopPoint       = config.LB0steps - config.DAsteps;
-    taggerStopPoint         = config.TB0steps - config.DAsteps;
-    backerTagWaitTagPoint   = config.T2steps  - config.DAsteps;
-    backerTagWaitLabelPoint = config.TNsteps  - config.DAsteps;
-    backerLabelReleasePoint = config.LBsteps  - config.DAsteps;
-  }
-}
-
-boolean tagAtTB0(){
-  for (int i=0;i<tVec.length;i++){
-    //if (tVec[i].nbSteps == config.TB0steps){
-    if (tVec[i].nbSteps == taggerStopPoint){
-      return true;
-    }
-  }
-  return false;
-}
-boolean tagAtT2(){
-  for (int i=0;i<tVec.length;i++){
-    //if (tVec[i].nbSteps == config.T2steps){
-    if (tVec[i].nbSteps == backerTagWaitTagPoint){
-      return true;
-    }
-  }
-  return false;
-}
-boolean tagAtTN(){
-  for (int i=0;i<tVec.length;i++){
-    //if (tVec[i].nbSteps == config.TNsteps){
-    if (tVec[i].nbSteps == backerTagWaitLabelPoint-1){
-      return true;
-    }
-  }
-  return false;
-}
-boolean tagbetweenTB0andT2(){
-  for (int i=0;i<tVec.length;i++){
-    //if ((tVec[i].nbSteps > config.TB0steps) && (tVec[i].nbSteps < config.T2steps)){
-    if ((tVec[i].nbSteps > config.TB0steps) && (tVec[i].nbSteps < backerTagWaitTagPoint)){
-      return true;
-    }
-  }
-  return false;
-}
-boolean labebetweenLB0andLB(){
-  for (int i=0;i<lVec.length;i++){
-    //if ((tVec[i].nbSteps > config.TB0steps) && (tVec[i].nbSteps < config.T2steps)){
-    if ((lVec[i].nbSteps > labellerStopPoint) && (lVec[i].nbSteps < backerLabelReleasePoint)){
-      return true;
-    }
-  }
-  return false;
-}
-boolean labelAtLB0(){
-  for (int i=0;i<lVec.length;i++){
-    //if (lVec[i].nbSteps == config.LB0steps){
-    if (lVec[i].nbSteps == labellerStopPoint){
-      return true;
-    }
-  }
-  return false;
-}
-void printSpace(int n){
-  for (int i=0;i<n;i++){
-    print("-  ");
-  }
-}
-
-boolean taggerCanAdvance(){
-  boolean resNot = (tagAtTB0() && (!backerCanAdvance() || tagbetweenTB0andT2()));
-  if (!showBlocking){
-    return !resNot;
-  }
-  if (resNot && !blocked[0]){
-    blocked[0] = resNot;
-    println("Tagger blocked!");
-    doStop();
-  }
-  else if (!resNot && blocked[0]){
-     blocked[0] = resNot;
-     println("Tagger released!");
-     doStop();
-  }
-  return !resNot;
-}
-
-boolean labellerCanAdvance(){
-  //The labeller cannot advance if 
-  // there is a label at LB0 and (there is not tag that at TN)  OR there is a lable l with steps s such that LB0 < s < LB OR  if the backer cannot advance). wait on backer
-
-  boolean resNot = (labelAtLB0() && (!tagAtTN() || labebetweenLB0andLB() || !backerCanAdvance()));
-  if (!showBlocking){
-    return !resNot;
-  }
-  if (resNot && !blocked[1]){
-    blocked[1] = resNot;
-    printSpace(20);
-    println("Labeller blocked!");
-    doStop();
-  }
-  else if (!resNot &&  blocked[1]){
-    blocked[1] = resNot;
-    printSpace(20);
-    println("Labeller released.");
-    doStop();
-  }
-  return !resNot;
-}
-boolean backerCanAdvance(){
-  /*
-  The backer  cannot advance if a tag is at T2 and (no TAG is at TB0)! wait on tagger
-  The backer  cannot advance if a tag is at TN and (no label is at LB0)  wait on labeller
-  */
-  boolean resNot0 = (tagAtT2() && (!tagAtTB0())),
-          resNot1 = (tagAtTN() && (!labelAtLB0())),
-          resNot = resNot0 || resNot1;
-  if (!showBlocking){
-    return !resNot;
-  }
-  if (resNot0 && ! blocked[2]){
-    blocked[2] = true;
-    //println("\t\t\t\tBacker blocked on: TAGGER!");
-    printSpace(40);
-    println("Backer blocked on: TAGGER!");
-    doStop();
-  }
-  if (resNot1  && ! blocked[2]){
-    blocked[2] = true;
-    //println("\t\t\t\tBacker blocked on: LABELLER!");
-    printSpace(40);
-    println("Backer blocked on: LABELLER!");
-    doStop();
-  }
-  if (!resNot && blocked[2]){
-    blocked[2] = resNot;
-    //println("\t\t\t\tBacker released.");
-    printSpace(40);
-    println("Backer released.");
-    doStop();
-  }
-  return !resNot;
-} 
-
-/***************************** END Blocking Rules *************************/
 
 void draw(){
   background(0);
   platform.draw();
   
+  // For sticker recycling (simulation only)
   minTSteps = minSteps(tVec);
   minLSteps = minSteps(lVec);
   
-  labeller.stepOK = labellerCanAdvance();
-  tagger.stepOK   = taggerCanAdvance();
-  backer.stepOK   = backerCanAdvance();
+  labeller.canAdvance();
+  tagger.canAdvance();
+  backer.canAdvance();
   
   labeller.step();
   tagger.step();
   backer.step();
   
+  // For sticker recycling (simulation only)  
   if (CALLOUTtags){
     doTagCallouts();
   }
@@ -265,6 +95,8 @@ void draw(){
     doLabelCallouts();
   }
 }
+
+/****************************   SIMULATION CONTROL ***************************/
 
 void pause(){
   if (lop){
@@ -371,14 +203,15 @@ void doLabelCallouts(){
   }
 }
 
-
 void keyPressed(){
   /*
         CALLOUTtags   = false,
         CALLOUTlabels = false,
         showSync      = false,
         showBlocking  = false,
-        stopAtMessage = false;
+        stopAtMessage = false,
+        blockAtRamp   = true,
+        speed = config.frameRate;
         */
   if ((key == 'A') || (key == 'a')){
     config.setSpeed(true);
@@ -396,8 +229,8 @@ void keyPressed(){
     stopAtMessage = !stopAtMessage;
   }
   else  if ((key == 'R') || (key == 'r')){
-    blockAtRampEnd = !blockAtRampEnd;
-    setStopPoints();    
+    blockAtRamp = !blockAtRamp;
+    bM.setStopPoints(blockAtRamp);   
   }else  if ((key == 'S') || (key == 's')){
     showSync = !showSync;
   }
