@@ -1,11 +1,10 @@
 Config config  = null;
 BlockingMgr bM = null;
 SimuMgr sM     = null;
-SyncLock sy    = null;  
 App app        = null;
 CommsMgr cm    = null;
 
-boolean isSimulation = false;
+boolean isSimulation = true; //s false;
 
 boolean testing = false;//true;
 
@@ -24,16 +23,12 @@ void setup(){
 void initApp(){
   if (isSimulation){
     bM     = new BlockingMgr(config);
-    sy     = new SyncLock();
-  }
-  sM     = new SimuMgr(bM,config,sy);
-  if (isSimulation){
-     sy.postInstanciation(sM);
   }
   else{  // not sim so create the comms manager
     cm = new CommsMgr(portName);
   }
-  app    = new App(config, bM, sM, sy, cm);
+  sM     = new SimuMgr(bM,config);
+  app    = new App(config, bM, sM, cm);
 }
 
 void draw(){

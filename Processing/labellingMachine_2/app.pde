@@ -3,10 +3,7 @@ class SimuMgr{
   Platform platform ;
   Config config;
   BlockingMgr bM;
-  SyncLock s;  
   
-  //Sticker tVec[];
-  //Sticker lVec[];
   ArrayList<Sticker> tVec;
   ArrayList<Sticker> lVec;
   
@@ -36,10 +33,9 @@ class SimuMgr{
   int minTSteps,  
       minLSteps;
   
-  SimuMgr(BlockingMgr b, Config c, SyncLock sy){
+  SimuMgr(BlockingMgr b, Config c){
     bM = b;
     config = c;
-    s = sy;
     platform = new Platform(config);
     
     tagDelay   = config.ITsteps; 
@@ -53,11 +49,11 @@ class SimuMgr{
     
     if (isSimulation){
       for (int i = 0; i< nbTags;i++){
-        tVec.add(new Sticker(config,1,s,true));
+        tVec.add(new Sticker(config,1,true));
         tVec.get(i).nbSteps = -(tagDelay +config.Tsteps)*(i+1) + ( i==0 ? 0 : -1)*round(random(-config.ITesteps,config.ITesteps));  
       }
       for (int i = 0; i< nbLabels;i++){
-        lVec.add(new Sticker(config,2,s,false)); 
+        lVec.add(new Sticker(config,2,false)); 
         lVec.get(i).nbSteps = -(labelDelay+config.Lsteps) *(i+1) + ( i==0 ? 0 : -1)*round(random(-config.ILLesteps,config.ILLesteps));
       }
     }
@@ -103,7 +99,7 @@ class SimuMgr{
   
   Sticker updateTag(Sticker t){  
     if ((t.support == 3) && (t.nbSteps > tagEndStep)) { 
-      t = new Sticker(config,1,s,true); 
+      t = new Sticker(config,1,true); 
       t.nbSteps = minTSteps - (tagDelay+config.Tsteps) - round(random(-config.ITesteps,config.ITesteps));
     }
     return t;
@@ -111,7 +107,7 @@ class SimuMgr{
   
   Sticker updateLabel(Sticker l){
      if ((l.support == 3) && (l.nbSteps > labelEndStep)) { 
-      l = new Sticker(config,2,s,false);
+      l = new Sticker(config,2,false);
       l.nbSteps = minLSteps- (labelDelay+config.Lsteps) - round(random(-config.ILLesteps,config.ILLesteps)); //+round(random(-config.ILLesteps,config.ILLesteps)));
     }
     return l;
@@ -184,19 +180,21 @@ class SimuMgr{
       }
     }
   }
-  void visuKeyPressed(){
+  boolean visuKeyPressed(){
     if ((key == 'L') || (key == 'l')){
       CALLOUTlabels = !CALLOUTlabels;
+      return true;
     }
     else  if ((key == 'T') || (key == 't')){
       CALLOUTtags = !CALLOUTtags;
+      return true;
     }
+    return false;
   }
   void simuKeyPressed(){
     /*
           CALLOUTtags   = false,
           CALLOUTlabels = false,
-          showSync      = false,
           showBlocking  = false,
           stopAtMessage = false,
           blockAtRamp   = true,
@@ -217,16 +215,14 @@ class SimuMgr{
     else  if ((key == 'R') || (key == 'r')){
       blockAtRamp = !blockAtRamp;
       bM.setStopPoints(blockAtRamp);   
-    }else  if ((key == 'S') || (key == 's')){
-      showSync = !showSync;
     }
     else{
       pause();
     }
   }
   void keyPressed(){
-    visuKeyPressed();
-    if (isSimulation){
+    boolean res = visuKeyPressed();
+    if (isSimulation && ! res){
       simuKeyPressed();
     }
   }    
@@ -240,18 +236,16 @@ class App{
   Config config;
   BlockingMgr bM;
   SimuMgr sM;
-  SyncLock sy;  
   CommsMgr cMgr;
        
-  App(Config c, BlockingMgr b, SimuMgr smm, SyncLock syy, CommsMgr cm){
+  App(Config c, BlockingMgr b, SimuMgr smm, CommsMgr cm){
     config = c;
     bM = b;
     sM = smm;
-    sy = syy;
     cMgr = cm;
-    tagger   = new Driver(1, sy, config, bM, sM);
-    labeller = new Driver(2, sy, config, bM, sM);
-    backer   = new Driver(3, sy, config, bM, sM);
+    tagger   = new Driver(1, config, bM, sM);
+    labeller = new Driver(2, config, bM, sM);
+    backer   = new Driver(3, config, bM, sM);
      if (isSimulation){
       bM.setStopPoints(sM.blockAtRamp);
      }
@@ -285,10 +279,10 @@ class App{
       clearLastLTPair();
     }
     if (boolean(curr & (1<<4))){
-      sM.lVec.add(new Sticker(config,2,sy,false));
+      sM.lVec.add(new Sticker(config,2,false));
     }
     if (boolean(curr & (1<<5))){
-      sM.tVec.add(new Sticker(config,1,sy,true));
+      sM.tVec.add(new Sticker(config,1,true));
     }
     if (boolean(curr & (1<<6))){
       endOfSpoolDetected();

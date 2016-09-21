@@ -35,7 +35,6 @@ class BlockingMgr{
 
 class Driver{
   int supportID;
-  SyncLock syn;
   SimuMgr sm;
   boolean stepOK = true;
   ArrayList <Sticker> tVec,  // may be null
@@ -43,9 +42,8 @@ class Driver{
   Config  conf;  
   BlockingMgr bMgr;
   
-  Driver(int iDD, SyncLock s, Config  confi, BlockingMgr b, SimuMgr smm){ //Sticker[] tags, Sticker[] labels){
+  Driver(int iDD, Config  confi, BlockingMgr b, SimuMgr smm){ //Sticker[] tags, Sticker[] labels){
     conf      = confi;
-    syn       = s;
     bMgr      = b;
     sm        = smm;
     tVec      = sm.tVec;
