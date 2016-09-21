@@ -1,5 +1,10 @@
 #ifndef STICKERDEQUEUE_H
 #define STICKERDEQUEUE_H
+/* enter at the tail,
+ *  exit at the head
+ *  
+ */
+
 
 #include "sticker.h"
 #include "Arduino.h"
@@ -13,6 +18,7 @@ class StickerDequeue{
   protected:
     dNode *head=NULL,
           *tail=NULL;
+     dNode* newNode(Sticker*) const;
            
   public:
      StickerDequeue();

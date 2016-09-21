@@ -1,12 +1,22 @@
 #include "stickerDequeue.h"
+/* enter at the tail,
+ *  exit at the head
+ *  
+ */
+ 
+dNode* StickerDequeue::newNode(Sticker* s) const{
+  dNode * res =  new dNode();
+  res->data=s;
+  res->nxtptr = NULL;
+  return res;
+}
 
 StickerDequeue::StickerDequeue(){
 head = tail = NULL;
 }
 StickerDequeue::StickerDequeue(Sticker* nS){
-  head = new dNode;
-  head->nxtptr = NULL;
-  head->data = nS;
+  head = newNode(nS);
+  tail = head;
 }
 
 dNode * StickerDequeue::getHead() const {
@@ -31,36 +41,31 @@ Sticker * StickerDequeue::geTailSticker() const {
     return NULL;
 }
 void StickerDequeue::push(Sticker* s){
-  // put a new elt on front of deque
-  dNode* newHead = new dNode;
-  newHead->data = s;
-  newHead->nxtptr = head;
+  // put a new elt on tai lof dequeue
+  dNode* newTail = newNode(s);
   if (tail == NULL){  // empty Dequeue
-    tail = newHead;
+    head = newTail;
+    tail = newTail;
    }
-   head = newHead;
+   else{
+    tail->nxtptr = newTail;
+    tail= newTail; 
+   }
+   
 }
 
 Sticker* StickerDequeue::pop(){  
-  // take last off deque, deletes the pointed node but not the pointe Sticker  
-  if (tail == NULL){
-    // empty
+  // take head off deque, deletes the pointed node but not the pointed Sticker  
+  if (head) {
+    // not empty
+    Sticker * res = head->data;
+    dNode * tempHead = head;
+    head = head->nxtptr;
+    delete tempHead;
+    return res;
+  }
+  else{
     return NULL;
   }
-  Sticker * res = tail->data;
-  if (head == tail){ // only one elt
-    delete head;
-    head = tail = NULL;
-  }
-  else { // more than one elt
-    dNode *newTail = head;
-    while(newTail->nxtptr !=tail){
-      newTail = newTail->nxtptr;
-    }
-    // now we have the new tail
-    delete tail;
-    tail = newTail;
-  }
-  return res;
 }
 

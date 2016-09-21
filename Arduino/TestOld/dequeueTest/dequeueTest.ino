@@ -11,8 +11,10 @@ void setup() {
   
   t = new Tag();
   l = new Label();
-  sd = new StickerDequeue();
+  sd = new StickerDequeue(l);
+  Serial.println("pushed! label!");
   for (int i = 0;i<5;i++){
+    Serial.println("pushed! pair");
     sd->push(l);
     sd->push(t);
   }
