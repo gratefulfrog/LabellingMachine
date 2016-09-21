@@ -281,11 +281,13 @@ class App{
     }
     if (boolean(curr & (1<<4))){
       sM.lVec.add(new Sticker(config,2,false));
-      println("new\t LABEL!");
+      print("new\t LABEL!\t");
+      println(sM.lVec.size());
     }
     if (boolean(curr & (1<<5))){
       sM.tVec.add(new Sticker(config,1,true));
-       println("new\t TAG!");
+       print("new\t TAG!\t");
+       println(sM.tVec.size());
     }
     if (boolean(curr & (1<<6))){
       endOfSpoolDetected();

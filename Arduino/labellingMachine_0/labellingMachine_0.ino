@@ -5,6 +5,8 @@ labellingMachine Code!
 #include "sticker.h"
 #include "stickerDequeue.h"
 #include "detector.h"
+#include  "config.h"
+#include  "driver.h"
 
 #define LABEL_DELAY (220)
 #define TAG_DELAY  (120)
@@ -16,11 +18,33 @@ Detector *lDetector,
 StickerDequeue *lDeq,
                *tDeq;
 
+byte outgoing = 0;
+unsigned long counter =0;
+
 Detector *makeDetector(unsigned long nbSteps, bool reset){
   return new Detector(*(new SimulatedPhysicalDetector(nbSteps, reset)));
 }
 
 void setup() {
+  
+  Driver *tagger   = new Driver(0),
+         *labeller = new Driver(1),
+         *backer   = new Driver(2);
+  Serial.begin(9600);
+  while (!Serial) {}
+  
+  Serial.println("ah");
+  tagger->canAdvance();
+  labeller->canAdvance();
+  backer->canAdvance();
+  Serial.println(tagger->getStepOK());
+  //Serial.println(tagger->getSupportID());
+  Serial.println(labeller->getStepOK()); 
+  //Serial.println(labeller->getSupportID());  
+  Serial.println(backer->getStepOK()); 
+  //Serial.println(backer->getSupportID());
+  Serial.println("oops");
+  /*
   lDeq = new StickerDequeue(new Label());
   tDeq = new StickerDequeue(new Tag());
   lDetector = makeDetector(LABEL_DELAY, true);
@@ -30,9 +54,59 @@ void setup() {
   Serial.begin(115200);
   while (!Serial) {;}
   establishContact();
-  
+  outgoing = B110000;
+  Serial.write(outgoing);
+  outgoing = 0;
+  */
+}
+void loop(){}
+/*
+void  setAlerts(){
+  outgoing |= (counter && !(counter % 1219)) ? (1<<6) : 0;
+  outgoing |= (counter && !(counter % 2797)) ? (1<<7) : 0;
 }
 
+void detectNewTagsAndLabels(){
+  if(lDetector->stickerDetected(counter)){
+    // create a new pair here
+    outgoing |= (1<<4);
+    lDeq->push(new Label());
+    outgoing |= (1<<5) ;
+    tDeq->push(new Tag());
+  }
+}
+
+void detectedExpiredTagLabelPairs(){
+  if (bDetector->stickerDetected(lDeq->getHead()->data->getNbSteps())){  
+    // remove labels and tags off the end  
+    delete lDeq->pop();
+    delete tDeq->pop();
+    outgoing |=  (1<<3);
+  }
+}
+void updateStickerSupport(){
+  StickerDequeue * qs[] = {lDeq,tDeq};
+  int lims[] = {Config::LB0steps,Config::TB0steps};
+  
+  for (int i=0;i<2;i++){
+    StickerDequeue *sd = qs[i]; 
+    for (dNode* s = sd->getHead(); s != NULL; s = s->nxtptr){
+      if(s->data->getNbSteps() >= lims[i]) { // then it's on the backer
+        s->data->setSupport(2);
+      }
+    }
+  }
+}
+
+/*
+void setDriversOk2Step(){
+  /*
+   * labeller.canAdvance(); outgoing |= (1<<1)
+   * tagger.canAdvance();   outgoing |= (1<<2)
+   * backer.canAdvance();   outgoing |=1
+   //* /
+  outgoing |= B111;
+}
 void stepAll(){
   StickerDequeue * qs[] = {lDeq,tDeq};
   for (int i=0;i<2;i++){
@@ -41,55 +115,30 @@ void stepAll(){
       s->data->step();
     }
   }
-}
-
-unsigned long counter = 0,
-              killCounter = 0;
-
-byte outgoing = B00110000;
+}  
 
 void loop() {
-  if (bDetector->stickerDetected(lDeq->getHead()->data->getNbSteps())){    
-    delete lDeq->pop();
-    delete tDeq->pop();
-    outgoing |=  (1<<3);
-  }
-  if(lDetector->stickerDetected(counter)){
-    outgoing |= (1<<4);
-    lDeq->push(new Label());
-  //}
-  //if (tDetector->stickerDetected(counter)){
-     outgoing |= (1<<5) ;
-     tDeq->push(new Tag());
-  }
- 
-  outgoing |= (counter && !(counter % 1219)) ? (1<<6) : 0;
-  outgoing |= (counter && !(counter % 2797)) ? (1<<7) : 0;
-  Serial.write(outgoing);
-  stepAll();
-  outgoing = B111;
   /*
-  if (killCounter > 0 && !(killCounter % 750)){ // remove
-    killCounter-=220;
-    Serial.write(1<<3);
-  }
-  if ( !(counter % 220)){ // add label
-    Serial.write(1<<4);
-  }
-  if ( !(counter % 220)){ // addd tag 120 is the normal sep
-    Serial.write(1<<5);
-  }
-  if (counter && !(counter % 1219)){ // end of spool
-    Serial.write(1<<6);
-  }
-  if (counter && !(counter % 2797)){ // end of spool
-    Serial.write(1<<7);
-  }
-  */
-  //Serial.write(B111);
+   * Algo:
+   * 1. reset outgoing
+   * 2. detect alerts, and OR into outgoing
+   * 3. detect new tag, label, end, or that to outgoing
+   * 4. update the support of each sticker (DEFNITLY NEEDED!)
+   * 5. for each driver, set OK2Step and OR that to the outgoing
+   * 6. send outgoing
+   * 7. step all as per step ok
+   * /
+  outgoing = 0;
+  setAlerts();
+  detectNewTagsAndLabels();
+  detectedExpiredTagLabelPairs();
+  updateStickerSupport();
+  setDriversOk2Step();
+  Serial.write(outgoing);
+  stepAll();  // resets outgoing to B111
+  
   counter++;
-  killCounter++;
-  delay(10);
+  delay(5);  // min for processing is 3 on my PC
 
 }
 
@@ -102,4 +151,4 @@ void establishContact() {
   while (Serial.available() <0) {;}
     inByte = Serial.read();
 }
-
+*/

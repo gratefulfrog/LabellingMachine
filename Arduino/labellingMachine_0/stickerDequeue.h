@@ -1,4 +1,4 @@
-#ifndef STICKERDEQUEUE_H
+    #ifndef STICKERDEQUEUE_H
 #define STICKERDEQUEUE_H
 /* enter at the tail,
  *  exit at the head

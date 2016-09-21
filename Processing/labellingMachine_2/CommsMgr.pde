@@ -23,6 +23,7 @@ class CommsMgr{
       return 0;
     }
     else {
+      //println(mVec.size());
       return mVec.remove(0).val;
     }
   }

@@ -15,7 +15,12 @@ void setup(){
   background(0);
   config = new Config();
   initApp();
-  frameRate(200);// config.speed);  // nb frames or steps per second
+  if (isSimulation){
+    frameRate(config.speed);
+  }
+  else{ // full speed!
+    frameRate(1000);// config.speed);  // nb frames or steps per second
+  }
   //println(config.Tsteps + config.ITsteps);
   //exit();
 }

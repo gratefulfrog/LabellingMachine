@@ -1,7 +1,7 @@
 #include "sticker.h"
 
 
-Sticker::Sticker(int t) : type(t), nbSteps(0){}
+Sticker::Sticker(int t) : type(t), nbSteps(0), support(t){}
 
 void Sticker::step(){
   nbSteps++;
@@ -13,7 +13,15 @@ unsigned int Sticker::getType() const{
   return type;
 }
 
-Tag::Tag() : Sticker(1){}
+unsigned int Sticker::getSupport() const{
+  return support;
+}
+void Sticker::setSupport(unsigned int i){
+  support = i;
+}
 
-Label::Label() : Sticker(2){}
+
+Tag::Tag() : Sticker(0){}
+
+Label::Label() : Sticker(1){}
 

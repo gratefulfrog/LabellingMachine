@@ -7,13 +7,16 @@
 class Sticker{
   protected:
     unsigned int nbSteps;
-    const unsigned int type;
+    const unsigned int type; 
+    unsigned int support;
 
   public:
      Sticker(int t);
      void step();
      unsigned int getNbSteps() const;
      unsigned int getType() const;
+     unsigned int getSupport() const;
+     void setSupport(unsigned int);
 };
 
 class Tag : public Sticker{
