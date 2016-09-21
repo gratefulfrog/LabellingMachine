@@ -4,6 +4,13 @@
 #include "Arduino.h"
 #include "stickerDequeue.h"
 
+class  PhyscialDriver {
+  // this is a placeholder for the real motor driver
+  public:
+    PhyscialDriver(){}
+    void step(){}
+};
+
 class Driver;
 typedef  boolean (Driver::*aFuncPtr)() const;
 
@@ -12,25 +19,35 @@ class Driver{
     const int supportID;
     boolean stepOK = false;
     
-    boolean taggerCanAdvance() const;
-    boolean labellerCanAdvance() const;
-    boolean backerCanAdvance() const;
     static aFuncPtr fa[];
-    static StickerDequeue *lDeq,
-                          *tDeq;
+    const StickerDequeue *lDq,
+                          *tDq;
+    PhyscialDriver *physicalDriver;
+
+    unsigned long nbSteps;
 
      /*** blocking rules ****/
+     boolean tagAtTB0() const;
+     boolean tagAtT2() const;
+     boolean tagAtTN() const;
+     boolean tagbetweenTB0andT2() const;
+     boolean labebetweenLB0andLB() const;
+     boolean labelAtLB0() const;
+     boolean taggerCanAdvance() const;
+     boolean labellerCanAdvance() const;
+     boolean backerCanAdvance() const;
   
      /*** end blocking rules ****/
     
   public:
     static void staticInit(StickerDequeue *lq, StickerDequeue *tq);
     
-    Driver(int i); // 0: tagger, 1, labeller, 2 backer
+    Driver(int i, const StickerDequeue *td, const StickerDequeue *ld,  PhyscialDriver *pD); // 0: tagger, 1, labeller, 2 backer
     int getSupportID() const; 
     boolean getStepOK() const;
-    void canAdvance(); // sets stepOK
+    boolean canAdvance(); // sets stepOK
     void step();      // checks stepOk and steps the driver motor!
+    unsigned long getNbSteps() const;
     
 };
 #endif

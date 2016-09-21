@@ -1,14 +1,16 @@
 
 #include "driver.h"
 #include "config.h"
+#include "blockingMgr.h"
 
 
-static void Driver::staticInit(StickerDequeue *lq, StickerDequeue *tq){
-  lDeq = lq;
-  tDeq = tq;
-}
-
-Driver::Driver(int i) :supportID(i) {}
+Driver::Driver(int i, const StickerDequeue *td, const StickerDequeue *ld, PhyscialDriver *pD) : 
+    supportID(i) , 
+    tDq(td), 
+    lDq(ld),
+    physicalDriver(pD),
+    nbSteps(0)
+    {}
 
 int Driver::getSupportID() const{
   return supportID;
@@ -16,22 +18,17 @@ int Driver::getSupportID() const{
 boolean Driver::getStepOK() const{
   return stepOK;                                     
 }
-boolean Driver::taggerCanAdvance() const{
-  return true;
-}
-boolean Driver::labellerCanAdvance() const{
-  return false;
-}
-boolean Driver::backerCanAdvance() const{
-  return true;
+unsigned long Driver::getNbSteps() const{
+  return nbSteps;
 }
 
 aFuncPtr Driver::fa[] = {&taggerCanAdvance,
                          &labellerCanAdvance,
                          &backerCanAdvance};
 
-void Driver::canAdvance(){
+boolean Driver::canAdvance(){
   stepOK = (this->*fa[supportID])();
+  return stepOK;
 }
 
 /***************************** Blocking Rules *************************/
@@ -51,7 +48,7 @@ void Driver::canAdvance(){
   The backer   cannot advance if a tag is at TN and (no label is at LB0)  wait on labeller
   */
 
-boolean Driver::eltAtPoint(StickerDequeue *deq, int pt) const{
+boolean eltAtPoint(const StickerDequeue * const deq, int pt) {
   for (dNode* s = deq->getHead(); s != NULL; s = s->nxtptr){
       if(s->data->getNbSteps() == pt) { // then it's on the backer
         return true;
@@ -60,7 +57,7 @@ boolean Driver::eltAtPoint(StickerDequeue *deq, int pt) const{
   return false;
 }
 
-boolean eltBetweenPoints(StickerDequeue *deq,int lowPoint,int highPoint){
+boolean eltBetweenPoints(const StickerDequeue * const deq, int lowPoint,int highPoint){
   for (dNode* s = deq->getHead(); s != NULL; s = s->nxtptr){
       if(s->data->getNbSteps() > lowPoint && s->data->getNbSteps() < highPoint) { // then it's on the backer
         return true;
@@ -69,9 +66,9 @@ boolean eltBetweenPoints(StickerDequeue *deq,int lowPoint,int highPoint){
   return false;
 }
 
-  boolean tagAtTB0(){
-    return eltAtPoint(Driver::tDeq,Config::taggerStopPoint);
-  }
+boolean Driver::tagAtTB0() const{
+  return eltAtPoint(tDq,BlockingMgr::taggerStopPoint);
+}
 /*
     for (int i=0;i<tVec.size();i++){
       if (tVec.get(i).nbSteps == bMgr.taggerStopPoint){
@@ -82,9 +79,9 @@ boolean eltBetweenPoints(StickerDequeue *deq,int lowPoint,int highPoint){
   }
 */
 
-  boolean tagAtT2(){
-    return eltAtPoint(tDeq,Config::backerTagWaitTagPoint);
-  }
+boolean Driver::tagAtT2() const {
+  return eltAtPoint(tDq,BlockingMgr::backerTagWaitTagPoint);
+}
 /*
     for (int i=0;i<tVec.size();i++){
       if (tVec.get(i).nbSteps == bMgr.backerTagWaitTagPoint){
@@ -94,10 +91,10 @@ boolean eltBetweenPoints(StickerDequeue *deq,int lowPoint,int highPoint){
     return false;
   }
 */
-  boolean tagAtTN(){
-    // is the '-1' really necessary???
-    return eltAtPoint(tDeq,Config::backerTagWaitLabelPoint-1);
-  }
+boolean Driver::tagAtTN() const{
+  // is the '-1' really necessary???
+  return eltAtPoint(tDq,BlockingMgr::backerTagWaitLabelPoint-1);
+}
 /*
     for (int i=0;i<tVec.size();i++){
       //if (tVec[i].nbSteps == config.TNsteps){
@@ -108,9 +105,9 @@ boolean eltBetweenPoints(StickerDequeue *deq,int lowPoint,int highPoint){
     return false;
   }
 */
-  boolean tagbetweenTB0andT2(){
-    return eltBetweenPoints(tDeq,Config::TB0steps, Config::backerTagWaitTagPoint);
-  }
+boolean Driver::tagbetweenTB0andT2() const{
+  return eltBetweenPoints(tDq,Config::TB0steps, BlockingMgr::backerTagWaitTagPoint);
+}
 /*
     for (int i=0;i<tVec.size();i++){
       if ((tVec.get(i).nbSteps > conf.TB0steps) && (tVec.get(i).nbSteps < bMgr.backerTagWaitTagPoint)){
@@ -120,9 +117,9 @@ boolean eltBetweenPoints(StickerDequeue *deq,int lowPoint,int highPoint){
     return false;
   }
 */
-  boolean labebetweenLB0andLB(){
-    return eltBetweenPoints(lDeq,Config::TB0steps, Config::backerLabelReleasePoint);
-  }
+boolean Driver::labebetweenLB0andLB() const{
+  return eltBetweenPoints(lDq,Config::TB0steps, BlockingMgr::backerLabelReleasePoint);
+}
 /*
     for (int i=0;i<lVec.size();i++){
       if ((lVec.get(i).nbSteps > bMgr.labellerStopPoint) && (lVec.get(i).nbSteps < bMgr.backerLabelReleasePoint)){
@@ -132,9 +129,9 @@ boolean eltBetweenPoints(StickerDequeue *deq,int lowPoint,int highPoint){
     return false;
   }
 */
-  boolean labelAtLB0(){
-    return eltAtPoint(lDeq,Config::labellerStopPoint);
-  }
+boolean Driver::labelAtLB0() const{
+  return eltAtPoint(lDq, BlockingMgr::labellerStopPoint);
+}
 /*
     for (int i=0;i<lVec.size();i++){
       if (lVec.get(i).nbSteps == bMgr.labellerStopPoint){
@@ -145,33 +142,48 @@ boolean eltBetweenPoints(StickerDequeue *deq,int lowPoint,int highPoint){
   }
 */
     
-  boolean taggerCanAdvance(){
-    boolean resNot = (tagAtTB0() && (!backerCanAdvance() || tagbetweenTB0andT2()));
-    return !resNot;
-    }
+boolean Driver::taggerCanAdvance() const{
+  boolean resNot = (tagAtTB0() && (!backerCanAdvance() || tagbetweenTB0andT2()));
+  return !resNot;
+}
     
   
-  boolean labellerCanAdvance(){
-    //The labeller cannot advance if 
-    // there is a label at LB0 and (there is not tag that at TN)  OR there is a lable l with steps s such that LB0 < s < LB OR  if the backer cannot advance). wait on backer
+boolean Driver::labellerCanAdvance() const{
+  //The labeller cannot advance if 
+  // there is a label at LB0 and (there is not tag that at TN)  OR there is a lable l with steps s such that LB0 < s < LB OR  if the backer cannot advance). wait on backer
+
+  boolean resNot = (labelAtLB0() && (!tagAtTN() || labebetweenLB0andLB() || !backerCanAdvance()));
+  return !resNot;
+}
   
-    boolean resNot = (labelAtLB0() && (!tagAtTN() || labebetweenLB0andLB() || !backerCanAdvance()));
-    return !resNot;
-  }
-  
-  boolean backerCanAdvance(){
-    /*
-    The backer  cannot advance if a tag is at T2 and (no TAG is at TB0)! wait on tagger
-    The backer  cannot advance if a tag is at TN and (no label is at LB0)  wait on labeller
-    */
-    boolean resNot0 = (tagAtT2() && (!tagAtTB0())),
-            resNot1 = (tagAtTN() && (!labelAtLB0())),
-            resNot = resNot0 || resNot1;
-    return !resNot;
-  }
+boolean Driver::backerCanAdvance() const{
+  /*
+  The backer  cannot advance if a tag is at T2 and (no TAG is at TB0)! wait on tagger
+  The backer  cannot advance if a tag is at TN and (no label is at LB0)  wait on labeller
+  */
+  boolean resNot0 = (tagAtT2() && (!tagAtTB0())),
+          resNot1 = (tagAtTN() && (!labelAtLB0())),
+          resNot = resNot0 || resNot1;
+  return !resNot;
+}
     
   /***************************** END Blocking Rules *************************/
 
 
-   //void step();      // checks stepOk and steps the driver motor!
+void Driver::step(){      // checks stepOk and steps the driver motor!
+  if (!stepOK){
+    return;
+  }
+  StickerDequeue * qs[] = {lDq,tDq};
+  for (int i=0;i<2;i++){
+    StickerDequeue *sd = qs[i]; 
+    for (dNode* s = sd->getHead(); s != NULL; s = s->nxtptr){
+      if (s->data->getSupport() == supportID){
+        s->data->step();
+      }
+    }
+  }
+  physicalDriver->step();
+  nbSteps++;
+}
 
