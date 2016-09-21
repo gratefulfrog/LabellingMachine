@@ -7,7 +7,7 @@
 class Sticker{
   protected:
     unsigned int nbSteps;
-    const  unsigned int type;
+    const unsigned int type;
 
   public:
      Sticker(int t);

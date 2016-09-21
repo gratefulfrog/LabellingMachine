@@ -98,6 +98,7 @@ class SimuMgr{
   }
   
   Sticker updateTag(Sticker t){  
+    // only called in simulation 
     if ((t.support == 3) && (t.nbSteps > tagEndStep)) { 
       t = new Sticker(config,1,true); 
       t.nbSteps = minTSteps - (tagDelay+config.Tsteps) - round(random(-config.ITesteps,config.ITesteps));
@@ -109,7 +110,7 @@ class SimuMgr{
      if ((l.support == 3) && (l.nbSteps > labelEndStep)) { 
       l = new Sticker(config,2,false);
       l.nbSteps = minLSteps- (labelDelay+config.Lsteps) - round(random(-config.ILLesteps,config.ILLesteps)); //+round(random(-config.ILLesteps,config.ILLesteps)));
-    }
+     }
     return l;
   }
   
@@ -280,9 +281,11 @@ class App{
     }
     if (boolean(curr & (1<<4))){
       sM.lVec.add(new Sticker(config,2,false));
+      println("new\t LABEL!");
     }
     if (boolean(curr & (1<<5))){
       sM.tVec.add(new Sticker(config,1,true));
+       println("new\t TAG!");
     }
     if (boolean(curr & (1<<6))){
       endOfSpoolDetected();

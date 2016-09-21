@@ -14,8 +14,9 @@ class PhysicalDetector{
 class SimulatedPhysicalDetector : public PhysicalDetector{
   protected:
     unsigned long stepLimit;
+    bool reset;
   public:
-    SimulatedPhysicalDetector(unsigned long limit);
+    SimulatedPhysicalDetector(unsigned long limit, bool resetOnDetection); // use reset for start deetectors, not for end backer detecor
     bool stickerDetected(unsigned long nbSteps); // must be defined in subclass with real code
 };
 
