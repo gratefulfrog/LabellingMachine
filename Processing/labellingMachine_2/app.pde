@@ -222,8 +222,8 @@ class SimuMgr{
     }
   }
   void keyPressed(){
-    boolean res = visuKeyPressed();
-    if (isSimulation && ! res){
+    if (isSimulation){
+      visuKeyPressed();
       simuKeyPressed();
     }
   }    
@@ -281,12 +281,12 @@ class App{
     }
     if (boolean(curr & (1<<4))){
       sM.lVec.add(new Sticker(config,2,false));
-      print("new\t LABEL!\tCurrently Active Labels:\t");
+      print("new: LABEL!  Currently Active Labels: ");
       println(sM.lVec.size());
     }
     if (boolean(curr & (1<<5))){
       sM.tVec.add(new Sticker(config,1,true));
-       print("new\t TAG!\tCurrently Active Tags:\t");
+       print("new: TAG!    Currently Active Tags:   ");
        println(sM.tVec.size());
     }
     if (boolean(curr & (1<<6))){

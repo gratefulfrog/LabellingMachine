@@ -1,41 +1,3 @@
-class SyncLock{
-  int masks[] = {1,2};
-  SimuMgr sM;
-      
-  int syncBits;
-  SyncLock(){
-    sM = null;
-    syncBits = 0;
-  }
-  void  postInstanciation(SimuMgr s){
-    sM = s;
-  }
-  
-  void sync(int bit,boolean onOff){
-    if (onOff){
-      syncBits |= masks[bit];
-    }
-    else{
-      syncBits &= masks[bit^1];
-    }
-  }
-  boolean isSynched(int bit){
-    // return true if the bit, i.e. the ID, is sync locked
-    return boolean(syncBits & masks[bit]);
-  }
-  
-  void show(){
-    if (!sM.showSync){
-      return;
-    }
-    
-    print("Sync:\t");
-    print((syncBits >> 1 )& 1);
-    print("--");
-    println(syncBits & 1);
-    sM.doStop();
-  }
-}
 
 class SimuSticker{
   color col;
@@ -86,14 +48,12 @@ class SimuSticker{
 class Sticker_ extends SimuSticker{
   int nbSteps, id;
   int support;  // 1 is tag, 2 is label, 3 is base
-  SyncLock sy;
   
-  Sticker_(int supp, float ww,float hh, color cc,int iDD, SyncLock syn, Config  c){
+  Sticker_(int supp, float ww,float hh, color cc,int iDD, Config  c){
     super(ww,hh,cc,c);
     id = iDD;
     support = supp;
     nbSteps = 0;
-    sy = syn;
   }
   
   void step(boolean doAStep){
@@ -113,13 +73,12 @@ class Sticker extends Sticker_{
  float startX,
        startY;
       
-  Sticker(Config  c, int sup, SyncLock syn, boolean isTag){
+  Sticker(Config  c, int sup, boolean isTag){
     super(sup, 
           isTag ? c.Tpixels        :c.Lpixels, 
           isTag ? c.THpixels       : c.LHpixels, 
           isTag ? c.tagMarkerColor : c.labelMarkerColor,
           isTag ? 1                : 0,
-          syn,
           c);
   }
   void updateSXSY(){
@@ -144,6 +103,7 @@ class Sticker extends Sticker_{
       }
     }
   }
+  
       
   void doStep(boolean doAStep){
     boolean forceStep = doAStep;
@@ -153,37 +113,18 @@ class Sticker extends Sticker_{
       transitioning = true;
       transitionStartSteps = nbSteps;
       backerStartSteps = conf.TB0steps;
-      if (!sy.isSynched(id)){
-        sy.sync(id,true); 
-        sy.show();
-      }
     }
     else if (!transitioning && (support == 2) && (nbSteps>=conf.LB0steps)){
       support = 2;
       transitioning = true;
       transitionStartSteps = nbSteps;
       backerStartSteps = conf.LB0steps;
-      if (!sy.isSynched(id)){
-        sy.sync(id,true); 
-        sy.show();
-      }
     }
     else if ((id == 1 && transitioning && nbSteps > conf.TBsteps - conf.DAsteps) || 
              (id == 0 && transitioning && nbSteps > conf.LBsteps - conf.DAsteps)) {
         transitioning = false;
         support = 3;
-        if (sy.isSynched(id)){
-          sy.sync(id,false); 
-          sy.show();
-        }
      }
-     /*
-     else if  ((id == 1 && transitioning && nbSteps > conf.TBsteps - conf.DAsteps) || 
-               (id == 0 && transitioning && nbSteps > conf.LBsteps - conf.DAsteps)) {
-        // it's hanging in the air! force the step!
-        forceStep = true;
-      }
-       */ 
     updateSXSY();
     pushMatrix();
     translate(startX,startY);

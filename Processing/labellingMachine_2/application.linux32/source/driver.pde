@@ -35,17 +35,15 @@ class BlockingMgr{
 
 class Driver{
   int supportID;
-  SyncLock syn;
   SimuMgr sm;
   boolean stepOK = true;
-  Sticker tVec[],  // may be null
-          lVec[];  // may be null
+  ArrayList <Sticker> tVec,  // may be null
+                      lVec;  // may be null
   Config  conf;  
   BlockingMgr bMgr;
   
-  Driver(int iDD, SyncLock s, Config  confi, BlockingMgr b, SimuMgr smm){ //Sticker[] tags, Sticker[] labels){
+  Driver(int iDD, Config  confi, BlockingMgr b, SimuMgr smm){ //Sticker[] tags, Sticker[] labels){
     conf      = confi;
-    syn       = s;
     bMgr      = b;
     sm        = smm;
     tVec      = sm.tVec;
@@ -75,49 +73,49 @@ class Driver{
   */
   
   boolean tagAtTB0(){
-    for (int i=0;i<tVec.length;i++){
-      if (tVec[i].nbSteps == bMgr.taggerStopPoint){
+    for (int i=0;i<tVec.size();i++){
+      if (tVec.get(i).nbSteps == bMgr.taggerStopPoint){
         return true;
       }
     }
     return false;
   }
   boolean tagAtT2(){
-    for (int i=0;i<tVec.length;i++){
-      if (tVec[i].nbSteps == bMgr.backerTagWaitTagPoint){
+    for (int i=0;i<tVec.size();i++){
+      if (tVec.get(i).nbSteps == bMgr.backerTagWaitTagPoint){
         return true;
       }
     }
     return false;
   }
   boolean tagAtTN(){
-    for (int i=0;i<tVec.length;i++){
+    for (int i=0;i<tVec.size();i++){
       //if (tVec[i].nbSteps == config.TNsteps){
-      if (tVec[i].nbSteps == bMgr.backerTagWaitLabelPoint-1){
+      if (tVec.get(i).nbSteps == bMgr.backerTagWaitLabelPoint-1){
         return true;
       }
     }
     return false;
   }
   boolean tagbetweenTB0andT2(){
-    for (int i=0;i<tVec.length;i++){
-      if ((tVec[i].nbSteps > conf.TB0steps) && (tVec[i].nbSteps < bMgr.backerTagWaitTagPoint)){
+    for (int i=0;i<tVec.size();i++){
+      if ((tVec.get(i).nbSteps > conf.TB0steps) && (tVec.get(i).nbSteps < bMgr.backerTagWaitTagPoint)){
         return true;
       }
     }
     return false;
   }
   boolean labebetweenLB0andLB(){
-    for (int i=0;i<lVec.length;i++){
-      if ((lVec[i].nbSteps > bMgr.labellerStopPoint) && (lVec[i].nbSteps < bMgr.backerLabelReleasePoint)){
+    for (int i=0;i<lVec.size();i++){
+      if ((lVec.get(i).nbSteps > bMgr.labellerStopPoint) && (lVec.get(i).nbSteps < bMgr.backerLabelReleasePoint)){
         return true;
       }
     }
     return false;
   }
   boolean labelAtLB0(){
-    for (int i=0;i<lVec.length;i++){
-      if (lVec[i].nbSteps == bMgr.labellerStopPoint){
+    for (int i=0;i<lVec.size();i++){
+      if (lVec.get(i).nbSteps == bMgr.labellerStopPoint){
         return true;
       }
     }
@@ -219,19 +217,20 @@ class Driver{
   }
 
   void step(){
-    if (lVec != null){
-      for (int i = 0; i< lVec.length; i++){
-        if (lVec[i].support == supportID){
-          lVec[i].doStep(stepOK);
-          lVec[i] = sm.updateLabel(lVec[i]);
+    for (int i = 0; i< lVec.size(); i++){
+      if (lVec.get(i).support == supportID){
+        lVec.get(i).doStep(stepOK);
+        if (isSimulation){
+          lVec.set(i,sm.updateLabel(lVec.get(i)));
         }
       }
     }
-    if (tVec != null){
-      for (int i = 0; i< tVec.length;i++){
-        if (tVec[i].support == supportID){
-          tVec[i].doStep(stepOK);
-          tVec[i] = sm.updateTag(tVec[i]);
+  
+    for (int i = 0; i< tVec.size();i++){
+      if (tVec.get(i).support == supportID){
+        tVec.get(i).doStep(stepOK);
+        if (isSimulation){
+          tVec.set(i,sm.updateTag(tVec.get(i)));
         }
       }
     }
