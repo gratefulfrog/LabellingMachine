@@ -31,7 +31,7 @@ class App{
     unsigned long counter =0;
 
     Detector *makeDetector(unsigned long nbSteps, bool reset);    
-    void  setAlerts();
+    void setAlerts();  // need to implement this in real machine
     void detectNewTagsAndLabels();
     void detectedExpiredTagLabelPairs();
     void updateStickerSupport();

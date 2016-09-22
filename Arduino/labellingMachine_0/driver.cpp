@@ -68,78 +68,27 @@ boolean eltBetweenPoints(const StickerDequeue * const deq, int lowPoint,int high
 boolean Driver::tagAtTB0() const{
   return eltAtPoint(tDq,BlockingMgr::taggerStopPoint);
 }
-/*
-    for (int i=0;i<tVec.size();i++){
-      if (tVec.get(i).nbSteps == bMgr.taggerStopPoint){
-        return true;
-      }
-    }
-    return false;
-  }
-*/
 
 boolean Driver::tagAtT2() const {
   return eltAtPoint(tDq,BlockingMgr::backerTagWaitTagPoint);
 }
-/*
-    for (int i=0;i<tVec.size();i++){
-      if (tVec.get(i).nbSteps == bMgr.backerTagWaitTagPoint){
-        return true;
-      }
-    }
-    return false;
-  }
-*/
+
 boolean Driver::tagAtTN() const{
   // is the '-1' really necessary???
   return eltAtPoint(tDq,BlockingMgr::backerTagWaitLabelPoint-1);
 }
-/*
-    for (int i=0;i<tVec.size();i++){
-      //if (tVec[i].nbSteps == config.TNsteps){
-      if (tVec.get(i).nbSteps == bMgr.backerTagWaitLabelPoint-1){
-        return true;
-      }
-    }
-    return false;
-  }
-*/
+
 boolean Driver::tagbetweenTB0andT2() const{
   return eltBetweenPoints(tDq,Config::TB0steps, BlockingMgr::backerTagWaitTagPoint);
 }
-/*
-    for (int i=0;i<tVec.size();i++){
-      if ((tVec.get(i).nbSteps > conf.TB0steps) && (tVec.get(i).nbSteps < bMgr.backerTagWaitTagPoint)){
-        return true;
-      }
-    }
-    return false;
-  }
-*/
+
 boolean Driver::labebetweenLB0andLB() const{
   return eltBetweenPoints(lDq,Config::TB0steps, BlockingMgr::backerLabelReleasePoint);
 }
-/*
-    for (int i=0;i<lVec.size();i++){
-      if ((lVec.get(i).nbSteps > bMgr.labellerStopPoint) && (lVec.get(i).nbSteps < bMgr.backerLabelReleasePoint)){
-        return true;
-      }
-    }
-    return false;
-  }
-*/
+
 boolean Driver::labelAtLB0() const{
   return eltAtPoint(lDq, BlockingMgr::labellerStopPoint);
 }
-/*
-    for (int i=0;i<lVec.size();i++){
-      if (lVec.get(i).nbSteps == bMgr.labellerStopPoint){
-        return true;
-      }
-    }
-    return false;
-  }
-*/
     
 boolean Driver::taggerCanAdvance() const{
   boolean resNot = (tagAtTB0() && (!backerCanAdvance() || tagbetweenTB0andT2()));

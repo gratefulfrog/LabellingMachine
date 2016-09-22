@@ -1,11 +1,11 @@
 #include  "app.h"
 
 App::App() {
-  // create the dequeues and put a new tag and lable on the dequeues  
+  // create the dequeues and put a new tag and lable on the dequeues (only for simulation!) 
   lDeq = new StickerDequeue(new Label());
   tDeq = new StickerDequeue(new Tag());
   
-  // inidcate that the initial label and tag are detected!
+  // inidcate that the initial label and tag are detected! (only for simulation!)
   outgoing = B110000;  
   // create the drivers
   
@@ -13,7 +13,7 @@ App::App() {
   labeller = new Driver(1,tDeq,lDeq);
   backer   = new Driver(2,tDeq,lDeq);
 
-  // create our pretend detectors
+  // create our pretend detectors (only for simulation!)
   lDetector = makeDetector(LABEL_DELAY, true);
   tDetector = makeDetector(TAG_DELAY, true);
   bDetector = makeDetector(KILL_DELAY, false);
@@ -24,10 +24,12 @@ App::App() {
 }
 
 Detector* App::makeDetector(unsigned long nbSteps, bool reset){
+  // in the machine, use the real pPhysicalDetector class!
   return new Detector(*(new SimulatedPhysicalDetector(nbSteps, reset)));
 }
 
 void  App::setAlerts(){
+  // (only for simulation!)
   outgoing |= (counter && !(counter % 1219)) ? (1<<6) : 0;
   outgoing |= (counter && !(counter % 2797)) ? (1<<7) : 0;
 }
@@ -84,16 +86,6 @@ void App::stepAll(){
   labeller->step();
   tagger->step(); 
   backer->step();
-  outgoing = 0;
-  /*
-  StickerDequeue * qs[] = {lDeq,tDeq};
-  for (int i=0;i<2;i++){
-    StickerDequeue *sd = qs[i]; 
-    for (dNode* s = sd->getHead(); s != NULL; s = s->nxtptr){
-      s->data->step();
-    }
-  }
-  */
 }  
 
 void App::loop() {
