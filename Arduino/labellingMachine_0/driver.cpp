@@ -1,16 +1,15 @@
-
 #include "driver.h"
 #include "config.h"
 #include "blockingMgr.h"
 
 
-Driver::Driver(int i, const StickerDequeue *td, const StickerDequeue *ld, PhyscialDriver *pD) : 
+Driver::Driver(int i, const StickerDequeue *td, const StickerDequeue *ld) : 
     supportID(i) , 
     tDq(td), 
     lDq(ld),
-    physicalDriver(pD),
-    nbSteps(0)
-    {}
+    nbSteps(0) {
+  PhyscialDriver *pD = new  PhyscialDriver();
+}
 
 int Driver::getSupportID() const{
   return supportID;

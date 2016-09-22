@@ -281,12 +281,12 @@ class App{
     }
     if (boolean(curr & (1<<4))){
       sM.lVec.add(new Sticker(config,2,false));
-      print("new\t LABEL!\t");
+      print("new\t LABEL!\tCurrently Active Labels:\t");
       println(sM.lVec.size());
     }
     if (boolean(curr & (1<<5))){
       sM.tVec.add(new Sticker(config,1,true));
-       print("new\t TAG!\t");
+       print("new\t TAG!\tCurrently Active Tags:\t");
        println(sM.tVec.size());
     }
     if (boolean(curr & (1<<6))){

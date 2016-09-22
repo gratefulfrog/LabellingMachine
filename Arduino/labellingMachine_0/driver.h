@@ -42,7 +42,7 @@ class Driver{
   public:
     static void staticInit(StickerDequeue *lq, StickerDequeue *tq);
     
-    Driver(int i, const StickerDequeue *td, const StickerDequeue *ld,  PhyscialDriver *pD); // 0: tagger, 1, labeller, 2 backer
+    Driver(int i, const StickerDequeue *td, const StickerDequeue *ld); // 0: tagger, 1, labeller, 2 backer
     int getSupportID() const; 
     boolean getStepOK() const;
     boolean canAdvance(); // sets stepOK

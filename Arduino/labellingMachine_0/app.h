@@ -1,0 +1,46 @@
+#ifndef APP_H
+#define APP_H
+
+#include "Arduino.h"
+#include "sticker.h"
+#include "stickerDequeue.h"
+#include "detector.h"
+#include  "config.h"
+#include  "driver.h"
+
+// simulation variables
+#define LABEL_DELAY (307)  // 207 is as tight as they can be
+#define TAG_DELAY  (200)  // 61 is as tight as they can be
+#define KILL_DELAY (720)
+
+class App{
+  protected:
+
+    Detector *lDetector,
+             *tDetector,
+             *bDetector;
+             
+    StickerDequeue *lDeq,
+                   *tDeq;
+    
+    Driver *tagger,
+             *labeller,
+             *backer;
+    
+    byte outgoing = 0;
+    unsigned long counter =0;
+
+    Detector *makeDetector(unsigned long nbSteps, bool reset);    
+    void  setAlerts();
+    void detectNewTagsAndLabels();
+    void detectedExpiredTagLabelPairs();
+    void updateStickerSupport();
+    void setDriversOk2Step();
+    void stepAll();
+ 
+  public:
+    App();
+    void loop();
+};
+
+#endif
