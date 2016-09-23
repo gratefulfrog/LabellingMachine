@@ -10,7 +10,7 @@ SMD42PhysicalDriver::SMD42PhysicalDriver(int p) : pin(p) {
 
 void SMD42PhysicalDriver::step(){
   digitalWrite(pin,HIGH);
-  delay(HWConfig::highDelay);
+  delayMicroseconds(HWConfig::highDelay);
   digitalWrite(pin,LOW);
   //delay(HWConfig::lowDelay);  // note needd sinc ethe loop has a delay already
 }
@@ -33,9 +33,9 @@ unsigned long Driver::getNbSteps() const{
   return nbSteps;
 }
 
-aFuncPtr Driver::fa[] = {&taggerCanAdvance,
-                         &labellerCanAdvance,
-                         &backerCanAdvance};
+aFuncPtr Driver::fa[] = {&Driver::taggerCanAdvance,
+                         &Driver::labellerCanAdvance,
+                         &Driver::backerCanAdvance};
 
 boolean Driver::canAdvance(){
   stepOK = (this->*fa[supportID])();
@@ -134,9 +134,9 @@ void Driver::step(){      // checks stepOk and steps the driver motor!
   if (!stepOK){
     return;
   }
-  StickerDequeue * qs[] = {lDq,tDq};
+  const StickerDequeue * qs[] = {lDq,tDq};
   for (int i=0;i<2;i++){
-    StickerDequeue *sd = qs[i]; 
+    const StickerDequeue *sd = qs[i]; 
     for (dNode* s = sd->getHead(); s != NULL; s = s->nxtptr){
       if (s->data->getSupport() == supportID){
         s->data->step();

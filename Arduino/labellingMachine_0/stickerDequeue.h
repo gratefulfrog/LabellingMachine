@@ -24,9 +24,9 @@ class StickerDequeue{
      StickerDequeue();
      StickerDequeue(Sticker*);
      dNode *getHead() const;
-     Sticker * StickerDequeue::getHeadSticker() const;
+     Sticker * getHeadSticker() const;
      dNode *getTail() const;
-     Sticker * StickerDequeue::geTailSticker() const;
+     Sticker * geTailSticker() const;
      void push(Sticker*); // put a new elt on front of deque
      Sticker* pop();  // take last off deque, deletes the pointed node
 };
