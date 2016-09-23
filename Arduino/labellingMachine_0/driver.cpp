@@ -1,14 +1,26 @@
 #include "driver.h"
 #include "config.h"
 #include "blockingMgr.h"
+#include "hwConfig.h"
 
+SMD42PhysicalDriver::SMD42PhysicalDriver(int p) : pin(p) {
+  pinMode(pin, OUTPUT);
+  digitalWrite(pin,LOW);
+}
 
-Driver::Driver(int i, const StickerDequeue *td, const StickerDequeue *ld) : 
+void SMD42PhysicalDriver::step(){
+  digitalWrite(pin,HIGH);
+  delay(HWConfig::highDelay);
+  digitalWrite(pin,LOW);
+  delay(HWConfig::lowDelay); 
+}
+
+Driver::Driver(int i, const StickerDequeue *td, const StickerDequeue *ld,int pin) : 
     supportID(i) , 
     tDq(td), 
     lDq(ld),
     nbSteps(0) {
-  PhyscialDriver *pD = new  PhyscialDriver();
+  physicalDriver = new SMD42PhysicalDriver(pin);
 }
 
 int Driver::getSupportID() const{

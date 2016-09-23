@@ -4,11 +4,20 @@
 #include "Arduino.h"
 #include "stickerDequeue.h"
 
-class  PhyscialDriver {
+class  PhysicalDriver {
   // this is a placeholder for the real motor driver
   public:
-    PhyscialDriver(){}
-    void step(){}
+    PhysicalDriver(){};
+    virtual void step() =0;
+};
+
+class  SMD42PhysicalDriver : public PhysicalDriver{
+  // this is a placeholder for the real motor driver
+  protected:
+    const int pin;
+  public:
+    SMD42PhysicalDriver(int p);
+    void step();
 };
 
 class Driver;
@@ -22,7 +31,7 @@ class Driver{
     static aFuncPtr fa[];
     const StickerDequeue *lDq,
                           *tDq;
-    PhyscialDriver *physicalDriver;
+    PhysicalDriver *physicalDriver;
 
     unsigned long nbSteps;
 
@@ -42,7 +51,7 @@ class Driver{
   public:
     static void staticInit(StickerDequeue *lq, StickerDequeue *tq);
     
-    Driver(int i, const StickerDequeue *td, const StickerDequeue *ld); // 0: tagger, 1, labeller, 2 backer
+    Driver(int i, const StickerDequeue *td, const StickerDequeue *ld,int p); // 0: tagger, 1, labeller, 2 backer
     int getSupportID() const; 
     boolean getStepOK() const;
     boolean canAdvance(); // sets stepOK

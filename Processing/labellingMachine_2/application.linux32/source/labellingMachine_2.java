@@ -139,25 +139,6 @@ class CommsMgr{
     }
   }
 }
-/*
-void serialEvent(Serial port) {
-  // read a byte from the serial port:
-  int inByte = port.read();
-  if (cm.firstContact == false) {
-    if (inByte == 'A') {
-      port.clear();          
-      cm.firstContact = true; 
-      port.write('A');       
-      println("\nCommunication Established!");
-    }
-  }
-  else {
-    //if (inByte != 65){
-      cm.mVec.add(new Message(inByte));
-    //}
-  }
-}
-*/
 class SimuMgr{
   /****************** SIMULATION VARIABLES **********************/
   Platform platform ;

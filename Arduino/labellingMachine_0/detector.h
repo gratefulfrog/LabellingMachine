@@ -20,8 +20,6 @@ class SimulatedPhysicalDetector : public PhysicalDetector{
     bool stickerDetected(unsigned long nbSteps); // must be defined in subclass with real code
 };
 
-
-
 class Detector{
   protected:
     PhysicalDetector &pD;

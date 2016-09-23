@@ -1,4 +1,5 @@
 #include  "app.h"
+#include  "hwConfig.h"
 
 App::App() {
   // create the dequeues and put a new tag and lable on the dequeues (only for simulation!) 
@@ -9,9 +10,9 @@ App::App() {
   outgoing = B110000;  
   // create the drivers
   
-  tagger   = new Driver(0,tDeq,lDeq);
-  labeller = new Driver(1,tDeq,lDeq);
-  backer   = new Driver(2,tDeq,lDeq);
+  tagger   = new Driver(0,tDeq,lDeq,HWConfig::taggerPin);
+  labeller = new Driver(1,tDeq,lDeq,HWConfig::labellerPin);
+  backer   = new Driver(2,tDeq,lDeq,HWConfig::backerPin);
 
   // create our pretend detectors (only for simulation!)
   lDetector = makeDetector(LABEL_DELAY,true);
@@ -113,5 +114,5 @@ void App::loop() {
   Serial.write(outgoing);
   stepAll();  // resets outgoing to 0  
   counter++;
-  delay(5);  // min for processing is 3 on my PC
+  delay(HWConfig::visualizationDelay);  // min for processing is 3 on my PC
 }
