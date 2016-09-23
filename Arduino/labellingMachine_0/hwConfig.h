@@ -16,6 +16,6 @@ class HWConfig{
                      backerPin   = J_B_PIN,
                      highDelay   = 50,  // microseconds
                      lowDelay    = 50; // microseconds
-     static const int visualizationDelay = max(0,round(5-(0.001*highDelay))); // milliseconds not low delay because this is not needed! + lowDelay);            
+    static const int visualizationDelay = max(0,round(5-(0.001*highDelay))); // milliseconds not low delay because this is not needed! + lowDelay);            
 };
 #endif

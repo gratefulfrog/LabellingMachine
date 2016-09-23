@@ -11,8 +11,13 @@ boolean testing = false;//true;
 String portName = "/dev/ttyACM0";
 
 void setup(){
+  if (args != null){
+    portName = args[0];
+  }
+  print("Commincition on port: " + portName);
   size(1800,300); // config.windowWidth, config.windowHeight MUST be the same numbers !!!!
   background(0);
+
   config = new Config();
   initApp();
   if (isSimulation){
@@ -21,8 +26,6 @@ void setup(){
   else{ // full speed!
     frameRate(1000);// config.speed);  // nb frames or steps per second
   }
-  //println(config.Tsteps + config.ITsteps);
-  //exit();
 }
 
 void initApp(){
