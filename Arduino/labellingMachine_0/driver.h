@@ -12,7 +12,6 @@ class  PhysicalDriver {
 };
 
 class  SMD42PhysicalDriver : public PhysicalDriver{
-  // this is a placeholder for the real motor driver
   protected:
     const int pin;
   public:
