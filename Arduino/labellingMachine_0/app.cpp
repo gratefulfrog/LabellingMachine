@@ -14,13 +14,14 @@ App::App() {
   backer   = new Driver(2,tDeq,lDeq);
 
   // create our pretend detectors (only for simulation!)
-  lDetector = makeDetector(LABEL_DELAY, true);
-  tDetector = makeDetector(TAG_DELAY, true);
+  lDetector = makeDetector(LABEL_DELAY,true);
+  tDetector = makeDetector(TAG_DELAY,  true);
   bDetector = makeDetector(KILL_DELAY, false);
+  eDetector = makeDetector(END_DELAY,  true);  // end of roll detector
+  jDetector = makeDetector(JAM_DELAY,  true); // jam detector
 
-  // send initial state and reset outgoing
+  // send initial state
   Serial.write(outgoing);
-  outgoing = 0;
 }
 
 Detector* App::makeDetector(unsigned long nbSteps, bool reset){
@@ -30,8 +31,12 @@ Detector* App::makeDetector(unsigned long nbSteps, bool reset){
 
 void  App::setAlerts(){
   // (only for simulation!)
-  outgoing |= (counter && !(counter % 1219)) ? (1<<6) : 0;
-  outgoing |= (counter && !(counter % 2797)) ? (1<<7) : 0;
+  if(eDetector->stickerDetected(labeller->getNbSteps())){
+    outgoing |= (1<<6);
+  }
+  if(jDetector->stickerDetected(labeller->getNbSteps())){
+    outgoing |=(1<<7);
+  }
 }
 
 void App::detectNewTagsAndLabels(){

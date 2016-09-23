@@ -11,14 +11,18 @@
 // simulation variables
 #define LABEL_DELAY (307)  // 207 is as tight as they can be
 #define TAG_DELAY  (200)  // 61 is as tight as they can be
-#define KILL_DELAY (720)
+#define KILL_DELAY (720)  // steps before removal
+#define END_DELAY (1219)   
+#define JAM_DELAY (2797)   
 
 class App{
   protected:
 
-    Detector *lDetector,
-             *tDetector,
-             *bDetector;
+    Detector *lDetector,  // label detector
+             *tDetector,  // tag detector
+             *bDetector,  // backer detector
+             *eDetector,  // end of roll detector
+             *jDetector;  // jam detector
              
     StickerDequeue *lDeq,
                    *tDeq;
