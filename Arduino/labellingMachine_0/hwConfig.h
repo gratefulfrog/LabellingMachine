@@ -5,6 +5,6 @@ class HWConfig{
                      backerPin   = 7,
                      highDelay   = 1,
                      lowDelay    = 1;
-     static const int visualizationDelay = 5 - (highDelay + lowDelay);            
+     static const int visualizationDelay = 5 - (highDelay); // not low delay because this is not needed! + lowDelay);            
 };
 

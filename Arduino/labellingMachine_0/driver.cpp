@@ -12,7 +12,7 @@ void SMD42PhysicalDriver::step(){
   digitalWrite(pin,HIGH);
   delay(HWConfig::highDelay);
   digitalWrite(pin,LOW);
-  delay(HWConfig::lowDelay); 
+  //delay(HWConfig::lowDelay);  // note needd sinc ethe loop has a delay already
 }
 
 Driver::Driver(int i, const StickerDequeue *td, const StickerDequeue *ld,int pin) : 
