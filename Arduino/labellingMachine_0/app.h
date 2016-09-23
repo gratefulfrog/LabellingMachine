@@ -5,8 +5,8 @@
 #include "sticker.h"
 #include "stickerDequeue.h"
 #include "detector.h"
-#include  "config.h"
-#include  "driver.h"
+#include "config.h"
+#include "driver.h"
 
 // simulation variables
 #define LABEL_DELAY (307)  // 207 is as tight as they can be
