@@ -2,17 +2,17 @@
  
  //static 
  const float  Config::RAdegrees = 21,  // ramp angle is a user configurable value
-                        Config::RA        = PI*(180-RAdegrees)/180.0, // not a user variable
-                        Config::sinRA     = sin(RA),               // not a user variable 
-                        Config::cosRA     = cos(RA),               // not a user variable
-                        Config::tanRA     = tan(RA),               // not a user variable
-                        Config::DA        = RH/sinRA,              // not a user variable
-                        Config::RX        = RH/tanRA;              // not a user variable
+              Config::RA        = PI*(180-RAdegrees)/180.0, // not a user variable
+              Config::sinRA     = sin(RA),               // not a user variable 
+              Config::cosRA     = cos(RA),               // not a user variable
+              Config::tanRA     = tan(RA),               // not a user variable
+              Config::DA        = RH/sinRA,              // not a user variable
+              Config::RX        = RH/tanRA;              // not a user variable
 
   
  // derived values not user variables!
     //static 
-    const int  Config::BIT    = Config::IL +Config::L,
+    const int  Config::BIT     = Config::IL +Config::L,
                 Config::TLS    = round((Config::L-Config::T)/2.0),
                 Config::BTL    = (Config::DS-Config::TLS),
                 Config::T0     = 0,
@@ -30,19 +30,19 @@
           
     // dimensions in steps
     //static 
-    const int  Config::Tsteps    = (Config::T    * Config::mm2Steps),
-                Config::ITsteps  = (Config::IT   * Config::mm2Steps), 
-                Config::ITesteps = (Config::ITe  * Config::mm2Steps),
-                Config::Lsteps   = (Config::L    * Config::mm2Steps),
-                Config::ILLsteps = (Config::ILL  * Config::mm2Steps),
-                Config::ILLesteps =(Config::ILLe * Config::mm2Steps),
-                Config::DPTsteps = (Config::DPT  * Config::mm2Steps),
-                Config::DPLsteps = (Config::DPL  * Config::mm2Steps),
-                Config::DSsteps  = (Config::DS   * Config::mm2Steps),
-                Config::DAsteps  = round(Config::DA   * Config::mm2Steps),
-                Config::RHsteps  = (Config::RH   * Config::mm2Steps),
-                Config::RXsteps = round(Config::RX   * Config::mm2Steps),
-                Config::ILsteps  = (Config::IL   * Config::mm2Steps);
+    const int  Config::Tsteps     = (Config::T    * Config::mm2Steps),
+                Config::ITsteps   = (Config::IT   * Config::mm2Steps), 
+                Config::ITesteps  = (Config::ITe  * Config::mm2Steps),
+                Config::Lsteps    = (Config::L    * Config::mm2Steps),
+                Config::ILLsteps  = (Config::ILL  * Config::mm2Steps),
+                Config::ILLesteps = (Config::ILLe * Config::mm2Steps),
+                Config::DPTsteps  = (Config::DPT  * Config::mm2Steps),
+                Config::DPLsteps  = (Config::DPL  * Config::mm2Steps),
+                Config::DSsteps   = (Config::DS   * Config::mm2Steps),
+                Config::DAsteps   = round(Config::DA   * Config::mm2Steps),
+                Config::RHsteps   = (Config::RH   * Config::mm2Steps),
+                Config::RXsteps   = round(Config::RX   * Config::mm2Steps),
+                Config::ILsteps   = (Config::IL   * Config::mm2Steps);
               
               
     // derived values
