@@ -4,7 +4,7 @@ SimuMgr sM     = null;
 App app        = null;
 CommsMgr cm    = null;
 
-boolean isSimulation = false;
+boolean isSimulation =  false;
 
 boolean testing = false;//true;
 

@@ -78,15 +78,7 @@ class Sticker_ extends SimuSticker{
 class Sticker extends Sticker_{
  float startX,
        startY;
-      
-  Sticker(Config  c, int sup, boolean isTag){
-    super(sup, 
-          isTag ? c.Tpixels        :c.Lpixels, 
-          isTag ? c.THpixels       : c.LHpixels, 
-          isTag ? c.tagMarkerColor : c.labelMarkerColor,
-          isTag ? 1                : 0,
-          c);
-  }
+  
    Sticker(Config  c, int sup, boolean isTag, int steps){
     super(sup, 
           isTag ? c.Tpixels        :c.Lpixels, 

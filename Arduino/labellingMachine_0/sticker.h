@@ -23,12 +23,10 @@ class Sticker{
 
 class Tag : public Sticker{
   public:
-    //Tag();
     Tag(int steps);
 };
 class Label : public Sticker{
   public:
-    //Label();
     Label(int steps);
 };
 

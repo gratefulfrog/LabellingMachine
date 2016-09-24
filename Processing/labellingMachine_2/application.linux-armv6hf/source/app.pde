@@ -49,12 +49,12 @@ class SimuMgr{
     
     if (isSimulation){
       for (int i = 0; i< nbTags;i++){
-        tVec.add(new Sticker(config,1,true));
-        tVec.get(i).nbSteps = -(tagDelay +config.Tsteps)*(i+1) + ( i==0 ? 0 : -1)*round(random(-config.ITesteps,config.ITesteps));  
+        tVec.add(new Sticker(config,1,true,-(tagDelay +config.Tsteps)*(i+1) + ( i==0 ? 0 : -1)*round(random(-config.ITesteps,config.ITesteps))));
+        //tVec.get(i).nbSteps = -(tagDelay +config.Tsteps)*(i+1) + ( i==0 ? 0 : -1)*round(random(-config.ITesteps,config.ITesteps));  
       }
       for (int i = 0; i< nbLabels;i++){
-        lVec.add(new Sticker(config,2,false)); 
-        lVec.get(i).nbSteps = -(labelDelay+config.Lsteps) *(i+1) + ( i==0 ? 0 : -1)*round(random(-config.ILLesteps,config.ILLesteps));
+        lVec.add(new Sticker(config,2,false, -(labelDelay+config.Lsteps) *(i+1) + ( i==0 ? 0 : -1)*round(random(-config.ILLesteps,config.ILLesteps)))); 
+        //lVec.get(i).nbSteps = -(labelDelay+config.Lsteps) *(i+1) + ( i==0 ? 0 : -1)*round(random(-config.ILLesteps,config.ILLesteps));
       }
     }
     

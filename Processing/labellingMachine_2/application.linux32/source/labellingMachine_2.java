@@ -22,7 +22,7 @@ SimuMgr sM     = null;
 App app        = null;
 CommsMgr cm    = null;
 
-boolean isSimulation = false;
+boolean isSimulation =  false;
 
 boolean testing = false;//true;
 
@@ -195,12 +195,12 @@ class SimuMgr{
     
     if (isSimulation){
       for (int i = 0; i< nbTags;i++){
-        tVec.add(new Sticker(config,1,true));
-        tVec.get(i).nbSteps = -(tagDelay +config.Tsteps)*(i+1) + ( i==0 ? 0 : -1)*round(random(-config.ITesteps,config.ITesteps));  
+        tVec.add(new Sticker(config,1,true,-(tagDelay +config.Tsteps)*(i+1) + ( i==0 ? 0 : -1)*round(random(-config.ITesteps,config.ITesteps))));
+        //tVec.get(i).nbSteps = -(tagDelay +config.Tsteps)*(i+1) + ( i==0 ? 0 : -1)*round(random(-config.ITesteps,config.ITesteps));  
       }
       for (int i = 0; i< nbLabels;i++){
-        lVec.add(new Sticker(config,2,false)); 
-        lVec.get(i).nbSteps = -(labelDelay+config.Lsteps) *(i+1) + ( i==0 ? 0 : -1)*round(random(-config.ILLesteps,config.ILLesteps));
+        lVec.add(new Sticker(config,2,false, -(labelDelay+config.Lsteps) *(i+1) + ( i==0 ? 0 : -1)*round(random(-config.ILLesteps,config.ILLesteps)))); 
+        //lVec.get(i).nbSteps = -(labelDelay+config.Lsteps) *(i+1) + ( i==0 ? 0 : -1)*round(random(-config.ILLesteps,config.ILLesteps));
       }
     }
     
@@ -1119,15 +1119,7 @@ class Sticker_ extends SimuSticker{
 class Sticker extends Sticker_{
  float startX,
        startY;
-      
-  Sticker(Config  c, int sup, boolean isTag){
-    super(sup, 
-          isTag ? c.Tpixels        :c.Lpixels, 
-          isTag ? c.THpixels       : c.LHpixels, 
-          isTag ? c.tagMarkerColor : c.labelMarkerColor,
-          isTag ? 1                : 0,
-          c);
-  }
+  
    Sticker(Config  c, int sup, boolean isTag, int steps){
     super(sup, 
           isTag ? c.Tpixels        :c.Lpixels, 
