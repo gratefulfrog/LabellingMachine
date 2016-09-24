@@ -12,7 +12,12 @@ String portName = "/dev/ttyACM0";
 
 void setup(){
   if (args != null){
+    if (args.length>1){
+        isSimulation = true;
+    }
+    else{
     portName = args[0];
+    }
   }
   print("Commincition on port: " + portName);
   size(1800,300); // config.windowWidth, config.windowHeight MUST be the same numbers !!!!
