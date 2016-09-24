@@ -3,9 +3,9 @@
 PhysicalDetector::PhysicalDetector() : lastDetectionSteps(0){
 }
 
-SimulatedPhysicalDetector::SimulatedPhysicalDetector(unsigned long limit,bool resetOnDetection) : stepLimit(limit), reset(resetOnDetection){}
+SimulatedPhysicalDetector::SimulatedPhysicalDetector(long limit,bool resetOnDetection) : stepLimit(limit), reset(resetOnDetection){}
 
-bool SimulatedPhysicalDetector::stickerDetected(unsigned long nbSteps){
+bool SimulatedPhysicalDetector::stickerDetected(long nbSteps){
   if (nbSteps-lastDetectionSteps>=stepLimit){
     lastDetectionSteps = reset ? nbSteps : 0;
     return true;
@@ -15,7 +15,7 @@ bool SimulatedPhysicalDetector::stickerDetected(unsigned long nbSteps){
 
 Detector::Detector(PhysicalDetector &pDD) : pD(pDD){}
 
-bool Detector::stickerDetected(unsigned long nbSteps) const{
+bool Detector::stickerDetected(long nbSteps) const{
   return pD.stickerDetected(nbSteps);
 }
 

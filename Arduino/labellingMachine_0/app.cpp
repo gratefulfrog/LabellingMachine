@@ -3,8 +3,8 @@
 
 App::App() {
   // create the dequeues and put a new tag and lable on the dequeues (only for simulation!) 
-  lDeq = new StickerDequeue(new Label());
-  tDeq = new StickerDequeue(new Tag());
+  lDeq = new StickerDequeue(new Label(-Config::Lsteps));
+  tDeq = new StickerDequeue(new Tag(-Config::Tsteps));
   
   // inidcate that the initial label and tag are detected! (only for simulation!)
   outgoing = B110000;  
@@ -25,7 +25,7 @@ App::App() {
   Serial.write(outgoing);
 }
 
-Detector* App::makeDetector(unsigned long nbSteps, bool reset){
+Detector* App::makeDetector(long nbSteps, bool reset){
   // in the machine, use the real pPhysicalDetector class!
   return new Detector(*(new SimulatedPhysicalDetector(nbSteps, reset)));
 }
@@ -45,12 +45,14 @@ void App::detectNewTagsAndLabels(){
   //if(lDetector->stickerDetected(lDeq->getTail()->data->getNbSteps())){
     // create a new pair here
     outgoing |= (1<<4);
-    lDeq->push(new Label());
+    //lDeq->push(new Label());
+    lDeq->push(new Label(-Config::Lsteps));
   }
   if(tDetector->stickerDetected(tagger->getNbSteps())){
   //if(tDetector->stickerDetected(tDeq->getTail()->data->getNbSteps())){
     outgoing |= (1<<5) ;
-    tDeq->push(new Tag());
+    //tDeq->push(new Tag());
+    tDeq->push(new Tag(-Config::Tsteps));
   }
 }
 

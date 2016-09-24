@@ -53,7 +53,9 @@ void draw(){
   sM.callOut();
   
   // check the serial port
-  cm.readIncoming();
+  if (!isSimulation){
+    cm.readIncoming();
+  }
 }
 
 

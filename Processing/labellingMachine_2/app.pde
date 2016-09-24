@@ -100,16 +100,18 @@ class SimuMgr{
   Sticker updateTag(Sticker t){  
     // only called in simulation 
     if ((t.support == 3) && (t.nbSteps > tagEndStep)) { 
-      t = new Sticker(config,1,true); 
-      t.nbSteps = minTSteps - (tagDelay+config.Tsteps) - round(random(-config.ITesteps,config.ITesteps));
+      //t = new Sticker(config,1,true); 
+      //t.nbSteps = minTSteps - (tagDelay+config.Tsteps) - round(random(-config.ITesteps,config.ITesteps));
+      t = new Sticker(config,1,true,(minTSteps - (tagDelay+config.Tsteps) - round(random(-config.ITesteps,config.ITesteps))));
     }
     return t;
   }
   
   Sticker updateLabel(Sticker l){
      if ((l.support == 3) && (l.nbSteps > labelEndStep)) { 
-      l = new Sticker(config,2,false);
-      l.nbSteps = minLSteps- (labelDelay+config.Lsteps) - round(random(-config.ILLesteps,config.ILLesteps)); //+round(random(-config.ILLesteps,config.ILLesteps)));
+      //l = new Sticker(config,2,false);
+      //l.nbSteps = minLSteps- (labelDelay+config.Lsteps) - round(random(-config.ILLesteps,config.ILLesteps)); //+round(random(-config.ILLesteps,config.ILLesteps)));
+      l = new Sticker(config,2,false, (minLSteps- (labelDelay+config.Lsteps) - round(random(-config.ILLesteps,config.ILLesteps))));
      }
     return l;
   }
@@ -280,12 +282,14 @@ class App{
       clearLastLTPair();
     }
     if (boolean(curr & (1<<4))){
-      sM.lVec.add(new Sticker(config,2,false));
+      //sM.lVec.add(new Sticker(config,2,false));
+      sM.lVec.add(new Sticker(config,2,false,-config.Lsteps));
       print("new: LABEL!  Currently Active Labels: ");
       println(sM.lVec.size());
     }
     if (boolean(curr & (1<<5))){
-      sM.tVec.add(new Sticker(config,1,true));
+       //sM.tVec.add(new Sticker(config,1,true));
+       sM.tVec.add(new Sticker(config,1,true,-config.Tsteps));
        print("new: TAG!    Currently Active Tags:   ");
        println(sM.tVec.size());
     }

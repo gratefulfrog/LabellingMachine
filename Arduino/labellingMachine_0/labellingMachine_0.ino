@@ -26,7 +26,9 @@ void establishContact() {
   int inByte;
   
   while (Serial.available() <= 0) {
-    Serial.print('A');   // send a capital A
+    //Serial.print('A');   // send a capital A
+    byte b= 255;
+    Serial.write(b);  // send a zero
     delay(300);
   }
   while (Serial.available() <0) {;}

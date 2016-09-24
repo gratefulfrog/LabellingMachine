@@ -5,19 +5,19 @@
 
 class PhysicalDetector{
   protected:
-    unsigned long lastDetectionSteps;
+    long lastDetectionSteps;
   public:
     PhysicalDetector();
-    virtual bool stickerDetected(unsigned long nbSteps) =0; // must be defined in subclass with real code
+    virtual bool stickerDetected(long nbSteps) =0; // must be defined in subclass with real code
 };
 
 class SimulatedPhysicalDetector : public PhysicalDetector{
   protected:
-    unsigned long stepLimit;
+    long stepLimit;
     bool reset;
   public:
-    SimulatedPhysicalDetector(unsigned long limit, bool resetOnDetection); // use reset for start deetectors, not for end backer detecor
-    bool stickerDetected(unsigned long nbSteps); // must be defined in subclass with real code
+    SimulatedPhysicalDetector(long limit, bool resetOnDetection); // use reset for start deetectors, not for end backer detecor
+    bool stickerDetected(long nbSteps); // must be defined in subclass with real code
 };
 
 class Detector{
@@ -26,7 +26,7 @@ class Detector{
     
   public:
     Detector(PhysicalDetector&);
-    bool stickerDetected(unsigned long nbSteps) const;
+    bool stickerDetected(long nbSteps) const;
 };
 
 #endif

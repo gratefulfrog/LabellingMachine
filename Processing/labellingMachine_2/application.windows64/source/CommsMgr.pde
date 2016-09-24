@@ -32,7 +32,8 @@ class CommsMgr{
   }
   int interpretIncomingByte(){
     int v =  next();
-    if (v==65){ // a reset must have happend!
+    //if (v==65){ // a reset must have happend!
+    if (v==255){ // a reset must have happend!
       println("Arduino Reset Detected!");
       cm.firstContact = false;
       println("\nreset!");
@@ -47,7 +48,8 @@ class CommsMgr{
       // read a byte from the serial port:
       int inByte = machinePort.read();
       if (cm.firstContact == false) {
-        if (inByte == 'A') {
+        //if (inByte == 'A') {
+        if (inByte == 255) {
           machinePort.clear();          
           cm.firstContact = true; 
           machinePort.write('A');       
@@ -55,9 +57,7 @@ class CommsMgr{
         }
       }
       else {
-        //if (inByte != 65){
-          cm.mVec.add(new Message(inByte));
-        //}
+        cm.mVec.add(new Message(inByte));
       }
     }
   }

@@ -29,7 +29,7 @@ int Driver::getSupportID() const{
 boolean Driver::getStepOK() const{
   return stepOK;                                     
 }
-unsigned long Driver::getNbSteps() const{
+long Driver::getNbSteps() const{
   return nbSteps;
 }
 

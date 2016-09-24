@@ -55,6 +55,12 @@ class Sticker_ extends SimuSticker{
     support = supp;
     nbSteps = 0;
   }
+   Sticker_(int supp, float ww,float hh, color cc,int iDD, Config  c, int steps){
+    super(ww,hh,cc,c);
+    id = iDD;
+    support = supp;
+    nbSteps = steps;
+  }
   
   void step(boolean doAStep){
     if (doAStep) {
@@ -80,6 +86,15 @@ class Sticker extends Sticker_{
           isTag ? c.tagMarkerColor : c.labelMarkerColor,
           isTag ? 1                : 0,
           c);
+  }
+   Sticker(Config  c, int sup, boolean isTag, int steps){
+    super(sup, 
+          isTag ? c.Tpixels        :c.Lpixels, 
+          isTag ? c.THpixels       : c.LHpixels, 
+          isTag ? c.tagMarkerColor : c.labelMarkerColor,
+          isTag ? 1                : 0,
+          c,
+          steps);
   }
   void updateSXSY(){
     if (id == 1) { // it's a tag

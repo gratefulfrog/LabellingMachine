@@ -32,7 +32,7 @@ class Driver{
                           *tDq;
     PhysicalDriver *physicalDriver;
 
-    unsigned long nbSteps;
+    long nbSteps;
 
      /*** blocking rules ****/
      boolean tagAtTB0() const;
@@ -55,7 +55,7 @@ class Driver{
     boolean getStepOK() const;
     boolean canAdvance(); // sets stepOK
     void step();      // checks stepOk and steps the driver motor!
-    unsigned long getNbSteps() const;
+    long getNbSteps() const;
     
 };
 #endif

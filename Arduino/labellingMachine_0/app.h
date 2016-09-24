@@ -34,7 +34,7 @@ class App{
     byte outgoing = 0;
     unsigned long counter =0;
 
-    Detector *makeDetector(unsigned long nbSteps, bool reset);    
+    Detector *makeDetector(long nbSteps, bool reset);    
     void setAlerts();  // need to implement this in real machine
     void detectNewTagsAndLabels();
     void detectedExpiredTagLabelPairs();

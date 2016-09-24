@@ -71,7 +71,9 @@ public void draw(){
   sM.callOut();
   
   // check the serial port
-  cm.readIncoming();
+  if (!isSimulation){
+    cm.readIncoming();
+  }
 }
 
 
@@ -112,7 +114,8 @@ class CommsMgr{
   }
   public int interpretIncomingByte(){
     int v =  next();
-    if (v==65){ // a reset must have happend!
+    //if (v==65){ // a reset must have happend!
+    if (v==255){ // a reset must have happend!
       println("Arduino Reset Detected!");
       cm.firstContact = false;
       println("\nreset!");
@@ -127,7 +130,8 @@ class CommsMgr{
       // read a byte from the serial port:
       int inByte = machinePort.read();
       if (cm.firstContact == false) {
-        if (inByte == 'A') {
+        //if (inByte == 'A') {
+        if (inByte == 255) {
           machinePort.clear();          
           cm.firstContact = true; 
           machinePort.write('A');       
@@ -135,9 +139,7 @@ class CommsMgr{
         }
       }
       else {
-        //if (inByte != 65){
-          cm.mVec.add(new Message(inByte));
-        //}
+        cm.mVec.add(new Message(inByte));
       }
     }
   }
@@ -244,16 +246,18 @@ class SimuMgr{
   public Sticker updateTag(Sticker t){  
     // only called in simulation 
     if ((t.support == 3) && (t.nbSteps > tagEndStep)) { 
-      t = new Sticker(config,1,true); 
-      t.nbSteps = minTSteps - (tagDelay+config.Tsteps) - round(random(-config.ITesteps,config.ITesteps));
+      //t = new Sticker(config,1,true); 
+      //t.nbSteps = minTSteps - (tagDelay+config.Tsteps) - round(random(-config.ITesteps,config.ITesteps));
+      t = new Sticker(config,1,true,(minTSteps - (tagDelay+config.Tsteps) - round(random(-config.ITesteps,config.ITesteps))));
     }
     return t;
   }
   
   public Sticker updateLabel(Sticker l){
      if ((l.support == 3) && (l.nbSteps > labelEndStep)) { 
-      l = new Sticker(config,2,false);
-      l.nbSteps = minLSteps- (labelDelay+config.Lsteps) - round(random(-config.ILLesteps,config.ILLesteps)); //+round(random(-config.ILLesteps,config.ILLesteps)));
+      //l = new Sticker(config,2,false);
+      //l.nbSteps = minLSteps- (labelDelay+config.Lsteps) - round(random(-config.ILLesteps,config.ILLesteps)); //+round(random(-config.ILLesteps,config.ILLesteps)));
+      l = new Sticker(config,2,false, (minLSteps- (labelDelay+config.Lsteps) - round(random(-config.ILLesteps,config.ILLesteps))));
      }
     return l;
   }
@@ -424,12 +428,14 @@ class App{
       clearLastLTPair();
     }
     if (PApplet.parseBoolean(curr & (1<<4))){
-      sM.lVec.add(new Sticker(config,2,false));
+      //sM.lVec.add(new Sticker(config,2,false));
+      sM.lVec.add(new Sticker(config,2,false,-config.Lsteps));
       print("new: LABEL!  Currently Active Labels: ");
       println(sM.lVec.size());
     }
     if (PApplet.parseBoolean(curr & (1<<5))){
-      sM.tVec.add(new Sticker(config,1,true));
+       //sM.tVec.add(new Sticker(config,1,true));
+       sM.tVec.add(new Sticker(config,1,true,-config.Tsteps));
        print("new: TAG!    Currently Active Tags:   ");
        println(sM.tVec.size());
     }
@@ -1090,6 +1096,12 @@ class Sticker_ extends SimuSticker{
     support = supp;
     nbSteps = 0;
   }
+   Sticker_(int supp, float ww,float hh, int cc,int iDD, Config  c, int steps){
+    super(ww,hh,cc,c);
+    id = iDD;
+    support = supp;
+    nbSteps = steps;
+  }
   
   public void step(boolean doAStep){
     if (doAStep) {
@@ -1115,6 +1127,15 @@ class Sticker extends Sticker_{
           isTag ? c.tagMarkerColor : c.labelMarkerColor,
           isTag ? 1                : 0,
           c);
+  }
+   Sticker(Config  c, int sup, boolean isTag, int steps){
+    super(sup, 
+          isTag ? c.Tpixels        :c.Lpixels, 
+          isTag ? c.THpixels       : c.LHpixels, 
+          isTag ? c.tagMarkerColor : c.labelMarkerColor,
+          isTag ? 1                : 0,
+          c,
+          steps);
   }
   public void updateSXSY(){
     if (id == 1) { // it's a tag
