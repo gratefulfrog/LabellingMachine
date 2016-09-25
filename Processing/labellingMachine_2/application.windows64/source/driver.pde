@@ -220,6 +220,8 @@ class Driver{
     for (int i = 0; i< lVec.size(); i++){
       if (lVec.get(i).support == supportID){
         lVec.get(i).doStep(stepOK);
+        //if (i==0 & stepOK)
+         // println("stepping Label: ",i, "it has stepped: ", lVec.get(i).nbSteps );
         if (isSimulation){
           lVec.set(i,sm.updateLabel(lVec.get(i)));
         }
@@ -229,6 +231,8 @@ class Driver{
     for (int i = 0; i< tVec.size();i++){
       if (tVec.get(i).support == supportID){
         tVec.get(i).doStep(stepOK);
+        //if (i==0 & stepOK)
+          //println("stepping Tag: ",i, "it has stepped: ", tVec.get(i).nbSteps );
         if (isSimulation){
           tVec.set(i,sm.updateTag(tVec.get(i)));
         }

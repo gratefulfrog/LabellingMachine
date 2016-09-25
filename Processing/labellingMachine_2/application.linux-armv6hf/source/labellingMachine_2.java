@@ -406,13 +406,18 @@ class App{
   }
   
   public void clearLastLTPair(){
-    println("Clearing a pair");
+    
     if (sM.lVec.size()>0){
       sM.lVec.remove(0);
     }
     if(sM.tVec.size()>0){
       sM.tVec.remove(0);
     }
+    println("Clearing a pair");
+    print("\t\tCurrently Active Labels: ");
+    println(sM.lVec.size());
+    print("\t\tCurrently Active Tags:   ");
+    println(sM.tVec.size());
   }
   
   public void endOfSpoolDetected(){
@@ -425,7 +430,16 @@ class App{
   
   public void updateMachineState(){
     int curr = cMgr.interpretIncomingByte();
-    
+    /*
+    if (curr !=0){
+      print(boolean((curr>>5) & 1) ? "New Tag ": "");
+      print(boolean((curr>>4) & 1) ? "NewLabel " :  "");
+      print(boolean((curr>>3) & 1) ? "Cleared " : "");
+      print(boolean((curr>>2) & 1) ? "Tagger Step " : "");
+      print(boolean((curr>>1) & 1) ? "Labeller Step " :"");
+      println(boolean(curr & 1) ? "Backer Step" : "");
+    }
+    */
     backer.stepOK   = PApplet.parseBoolean(curr & (1<<0));
     labeller.stepOK = PApplet.parseBoolean(curr & (1<<1));
     tagger.stepOK   = PApplet.parseBoolean(curr & (1<<2));
@@ -865,6 +879,8 @@ class Driver{
     for (int i = 0; i< lVec.size(); i++){
       if (lVec.get(i).support == supportID){
         lVec.get(i).doStep(stepOK);
+        //if (i==0 & stepOK)
+         // println("stepping Label: ",i, "it has stepped: ", lVec.get(i).nbSteps );
         if (isSimulation){
           lVec.set(i,sm.updateLabel(lVec.get(i)));
         }
@@ -874,6 +890,8 @@ class Driver{
     for (int i = 0; i< tVec.size();i++){
       if (tVec.get(i).support == supportID){
         tVec.get(i).doStep(stepOK);
+        //if (i==0 & stepOK)
+          //println("stepping Tag: ",i, "it has stepped: ", tVec.get(i).nbSteps );
         if (isSimulation){
           tVec.set(i,sm.updateTag(tVec.get(i)));
         }

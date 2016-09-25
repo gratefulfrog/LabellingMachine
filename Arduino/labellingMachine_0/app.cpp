@@ -2,12 +2,25 @@
 #include  "hwConfig.h"
 
 App::App() {
+
+  if (HWConfig::debug){
+    pinMode(DBG_RED,OUTPUT);
+    pinMode(DBG_GREEN,OUTPUT);
+    pinMode(DBG_YELLOW,OUTPUT);
+    
+    digitalWrite(DBG_RED,LOW);
+    digitalWrite(DBG_GREEN,LOW);
+    digitalWrite(DBG_YELLOW,LOW);
+    delay(100);
+    }
+  
+  
   // create the dequeues and put a new tag and lable on the dequeues (only for simulation!) 
-  lDeq = new StickerDequeue(new Label(-Config::Lsteps));
-  tDeq = new StickerDequeue(new Tag(-Config::Tsteps));
+  lDeq = new StickerDequeue(); //new Label(-Config::Lsteps));
+  tDeq = new StickerDequeue(); //new Tag(-Config::Tsteps));
   
   // inidcate that the initial label and tag are detected! (only for simulation!)
-  outgoing = B110000;  
+  //outgoing = B110000;  
   // create the drivers
   
   tagger   = new Driver(0,tDeq,lDeq,HWConfig::taggerPin);
@@ -15,29 +28,39 @@ App::App() {
   backer   = new Driver(2,tDeq,lDeq,HWConfig::backerPin);
 
   // create our pretend detectors (only for simulation!)
-  lDetector = makeDetector(LABEL_DELAY,true);
-  tDetector = makeDetector(TAG_DELAY,  true);
-  bDetector = makeDetector(KILL_DELAY, false);
-  eDetector = makeDetector(END_DELAY,  true);  // end of roll detector
-  jDetector = makeDetector(JAM_DELAY,  true); // jam detector
+  // lDetector = makeDetector(LABEL_DELAY,true,0);
+  // tDetector = makeDetector(TAG_DELAY,  true,0);
+  lDetector = makeDetector(HWConfig::labelDetectorPause, true, HWConfig::labelDetectorPin );
+  tDetector = makeDetector(HWConfig::tagDetectorPause,   true, HWConfig::tagDetectorPin);
+  
+  bDetector = makeDetector(KILL_DELAY, false,0);
+  //eDetector = makeDetector(END_DELAY,  true,0);  // end of roll detector
+  //jDetector = makeDetector(JAM_DELAY,  true,0); // jam detector
 
   // send initial state
   Serial.write(outgoing);
 }
 
-Detector* App::makeDetector(long nbSteps, bool reset){
-  // in the machine, use the real pPhysicalDetector class!
-  return new Detector(*(new SimulatedPhysicalDetector(nbSteps, reset)));
+Detector* App::makeDetector(long nbPauseSteps, bool reset, int pin){
+  // in the machine, use a real PhysicalDetector class!
+  if (!pin) { // simulation!
+    return new Detector(*(new SimulatedPhysicalEndDetector(nbPauseSteps)));
+  }
+  else{ // the real thing!
+    return new Detector(*(new ContrastDetector(pin,nbPauseSteps)));
+  }
 }
 
 void  App::setAlerts(){
-  // (only for simulation!)
+  return;
+  /*  was only for simulation!)
   if(eDetector->stickerDetected(labeller->getNbSteps())){
     outgoing |= (1<<6);
   }
   if(jDetector->stickerDetected(labeller->getNbSteps())){
     outgoing |=(1<<7);
   }
+  */
 }
 
 void App::detectNewTagsAndLabels(){
@@ -57,7 +80,10 @@ void App::detectNewTagsAndLabels(){
 }
 
 void App::detectedExpiredTagLabelPairs(){
-  if (bDetector->stickerDetected(lDeq->getHead()->data->getNbSteps())){  
+  if (!lDeq->getHead()){
+    return;
+  }
+  if (bDetector->stickerDetected(lDeq->getHeadSticker()->getNbSteps())){  
     // remove labels and tags off the end  
     delete lDeq->pop();
     delete tDeq->pop();
@@ -100,17 +126,18 @@ void App::loop() {
   /*
    * Algo:
    * 1. DONE: reset outgoing
-   * 2. DONE: detect alerts, and OR into outgoing
-   * 3. DONE: detect new tag, label, end, or that to outgoing
-   * 4. DONE: update the support of each sticker (DEFNITLY NEEDED!)
-   * 5. DONE: for each driver, set OK2Step and OR that to the outgoing
-   * 6. send outgoing
+   * 2. DONE: detect alerts, then  OR into outgoing
+   * 3. DONE: detecte expired label/tags pairs,thne OR that into outgoing
+   * 4. DONE: detect new tag, label then  OR that to outgoing
+   * 5. DONE: update the support of each sticker (DEFNITLY NEEDED!)
+   * 6. DONE: for each driver, set OK2Step then OR that to the outgoing
+   * 7. send outgoing
    * 7. step all as per step ok
    */
   outgoing = 0;
   setAlerts();
-  detectNewTagsAndLabels();
   detectedExpiredTagLabelPairs();
+  detectNewTagsAndLabels();
   updateStickerSupport();
   setDriversOk2Step();
   Serial.write(outgoing);

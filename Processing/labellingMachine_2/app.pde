@@ -255,13 +255,18 @@ class App{
   }
   
   void clearLastLTPair(){
-    println("Clearing a pair");
+    
     if (sM.lVec.size()>0){
       sM.lVec.remove(0);
     }
     if(sM.tVec.size()>0){
       sM.tVec.remove(0);
     }
+    println("Clearing a pair");
+    print("\t\tCurrently Active Labels: ");
+    println(sM.lVec.size());
+    print("\t\tCurrently Active Tags:   ");
+    println(sM.tVec.size());
   }
   
   void endOfSpoolDetected(){
@@ -274,7 +279,16 @@ class App{
   
   void updateMachineState(){
     int curr = cMgr.interpretIncomingByte();
-    
+    /*
+    if (curr !=0){
+      print(boolean((curr>>5) & 1) ? "New Tag ": "");
+      print(boolean((curr>>4) & 1) ? "NewLabel " :  "");
+      print(boolean((curr>>3) & 1) ? "Cleared " : "");
+      print(boolean((curr>>2) & 1) ? "Tagger Step " : "");
+      print(boolean((curr>>1) & 1) ? "Labeller Step " :"");
+      println(boolean(curr & 1) ? "Backer Step" : "");
+    }
+    */
     backer.stepOK   = boolean(curr & (1<<0));
     labeller.stepOK = boolean(curr & (1<<1));
     tagger.stepOK   = boolean(curr & (1<<2));

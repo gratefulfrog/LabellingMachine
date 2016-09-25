@@ -87,15 +87,15 @@ boolean Driver::tagAtT2() const {
 
 boolean Driver::tagAtTN() const{
   // is the '-1' really necessary???
-  return eltAtPoint(tDq,BlockingMgr::backerTagWaitLabelPoint-1);
+  return eltAtPoint(tDq,BlockingMgr::backerTagWaitLabelPoint);
 }
 
 boolean Driver::tagbetweenTB0andT2() const{
-  return eltBetweenPoints(tDq,Config::TB0steps, BlockingMgr::backerTagWaitTagPoint);
+  return eltBetweenPoints(tDq,BlockingMgr::taggerStopPoint  , BlockingMgr::backerTagWaitTagPoint);
 }
 
 boolean Driver::labebetweenLB0andLB() const{
-  return eltBetweenPoints(lDq,Config::TB0steps, BlockingMgr::backerLabelReleasePoint);
+  return eltBetweenPoints(lDq,BlockingMgr::labellerStopPoint, BlockingMgr::backerLabelReleasePoint);
 }
 
 boolean Driver::labelAtLB0() const{
@@ -104,26 +104,55 @@ boolean Driver::labelAtLB0() const{
     
 boolean Driver::taggerCanAdvance() const{
   boolean resNot = (tagAtTB0() && (!backerCanAdvance() || tagbetweenTB0andT2()));
+ if(HWConfig::debug){
+   if (!resNot){
+      digitalWrite(DBG_YELLOW,HIGH);
+      delay(HWConfig::flashDelay);
+      digitalWrite(DBG_YELLOW,LOW);
+      delay(HWConfig::flashDelay);
+    }
+ }
   return !resNot;
 }
     
   
 boolean Driver::labellerCanAdvance() const{
   //The labeller cannot advance if 
-  // there is a label at LB0 and (there is not tag that at TN)  OR there is a lable l with steps s such that LB0 < s < LB OR  if the backer cannot advance). wait on backer
+  // (there is a label at LB0 AND there is not tag that at TN)  
+  // OR 
+  // (there is a lablel with steps s such that LB0 < s < LB AND  the backer cannot advance). 
+  // ie. wait on backer
 
-  boolean resNot = (labelAtLB0() && (!tagAtTN() || labebetweenLB0andLB() || !backerCanAdvance()));
+  boolean resNot = (labelAtLB0() && (!tagAtTN())) || (labebetweenLB0andLB() && !backerCanAdvance());
+  if(HWConfig::debug){
+    if (!resNot){
+      digitalWrite(DBG_RED,HIGH);
+      delay(HWConfig::flashDelay);
+      digitalWrite(DBG_RED,LOW);
+      delay(HWConfig::flashDelay);
+    }
+  }
   return !resNot;
 }
-  
+
 boolean Driver::backerCanAdvance() const{
   /*
   The backer  cannot advance if a tag is at T2 and (no TAG is at TB0)! wait on tagger
   The backer  cannot advance if a tag is at TN and (no label is at LB0)  wait on labeller
+  The backer  cannot advance if there are no tags active tags.
   */
   boolean resNot0 = (tagAtT2() && (!tagAtTB0())),
           resNot1 = (tagAtTN() && (!labelAtLB0())),
-          resNot = resNot0 || resNot1;
+          resNot2 = !(tDq->getHead() == lDq->getHead() == NULL),
+          resNot = resNot0 || resNot1 || resNot2;
+  if(HWConfig::debug){
+    if (!resNot){
+      digitalWrite(DBG_GREEN,HIGH);
+      delay(HWConfig::flashDelay);
+      digitalWrite(DBG_GREEN,LOW);
+      delay(HWConfig::flashDelay);
+    }
+  }
   return !resNot;
 }
     

@@ -8,13 +8,6 @@
 #include "config.h"
 #include "driver.h"
 
-// simulation variables
-#define LABEL_DELAY (307)  // 207 is as tight as they can be
-#define TAG_DELAY  (200)  // 61 is as tight as they can be
-#define KILL_DELAY (720)  // steps before removal
-#define END_DELAY (1219)   
-#define JAM_DELAY (2797)   
-
 class App{
   protected:
 
@@ -34,7 +27,7 @@ class App{
     byte outgoing = 0;
     unsigned long counter =0;
 
-    Detector *makeDetector(long nbSteps, bool reset);    
+    Detector *makeDetector(long nbPauseSteps, bool reset, int pin);    
     void setAlerts();  // need to implement this in real machine
     void detectNewTagsAndLabels();
     void detectedExpiredTagLabelPairs();

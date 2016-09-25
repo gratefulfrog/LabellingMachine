@@ -12,7 +12,7 @@
   
  // derived values not user variables!
     //static 
-    const int  Config::BIT     = Config::IL +Config::L,
+    const int   Config::BIT     = Config::IL +Config::L,
                 Config::TLS    = round((Config::L-Config::T)/2.0),
                 Config::BTL    = (Config::DS-Config::TLS),
                 Config::T0     = 0,
@@ -30,7 +30,7 @@
           
     // dimensions in steps
     //static 
-    const int  Config::Tsteps     = (Config::T    * Config::mm2Steps),
+    const int   Config::Tsteps    = (Config::T    * Config::mm2Steps),
                 Config::ITsteps   = (Config::IT   * Config::mm2Steps), 
                 Config::ITesteps  = (Config::ITe  * Config::mm2Steps),
                 Config::Lsteps    = (Config::L    * Config::mm2Steps),
