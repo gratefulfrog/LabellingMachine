@@ -23,7 +23,6 @@
 #define B_L_PIN (6)   // bob labeller driver
 #define B_B_PIN (7)   // bob backer driver
 
-
 #define B_LD_PIN (12) // bob label detector
 #define B_TD_PIN (11) // bob tag detector
 
