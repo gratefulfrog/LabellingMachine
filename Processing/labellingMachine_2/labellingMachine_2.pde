@@ -4,22 +4,22 @@ SimuMgr sM     = null;
 App app        = null;
 CommsMgr cm    = null;
 
-boolean isSimulation =  false;
+boolean isSimulation =  true; //false;
 
 boolean testing = false;//true;
 
 String portName = "/dev/ttyACM0";
 
 void setup(){
-  if (args != null){
-    if (args.length>1){
+  if (this.args != null){
+    if (this.args.length>1){
         isSimulation = true;
     }
     else{
     portName = args[0];
+    print("Communication on port: " + portName);
     }
   }
-  print("Commincition on port: " + portName);
   size(1800,300); // config.windowWidth, config.windowHeight MUST be the same numbers !!!!
   background(0);
 

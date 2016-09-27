@@ -10,7 +10,7 @@ CommsMgr cm    = null;
 LinkedBlockingQueue<Integer> q;
 boolean firstContact =false;
 
-boolean isSimulation =  false;
+boolean isSimulation =  true; //false;
 
 boolean testing = false;//true;
 
@@ -18,8 +18,8 @@ String portName = "/dev/ttyACM0";
 Serial machinePort;
 
 void setup(){
-  if (args != null){
-    if (args.length>1){
+  if (this.args != null){
+    if (this.args.length>1){
         isSimulation = true;
     }
     else{
@@ -30,7 +30,7 @@ void setup(){
     println("Simulation!");
   }
   else{
-    println("Commincition on port: " + portName);
+    println("Communication on port: " + portName);
     machinePort = new Serial(this, portName, 115200);
   }
   size(1800,300); // config.windowWidth, config.windowHeight MUST be the same numbers !!!!

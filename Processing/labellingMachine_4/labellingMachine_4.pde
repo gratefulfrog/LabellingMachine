@@ -9,54 +9,55 @@ CommsMgr cm    = null;
 
 LinkedBlockingQueue<Integer> q;
 boolean firstContact =false;
-
-boolean isSimulation =  false;
-
-boolean testing = false;//true;
-
 String portName = "/dev/ttyACM0";
 Serial machinePort;
 
-void setup(){
-  if (args != null){
-    if (args.length>1){
+// testing and simulation
+boolean isSimulation =  true; //false;
+boolean testing = false;
+
+
+void setupSimulation(){
+  println("Simulation!");
+  bM = new BlockingMgr(config);
+  frameRate(config.speed);
+}
+
+void setupVisu(){
+  println("Communication on port: " + portName);
+  machinePort = new Serial(this, portName, 115200);
+  frameRate(1000);
+  q = new LinkedBlockingQueue<Integer>();
+  cm = new CommsMgr(q);
+  frameRate(1000);
+}
+
+void checkCLArgs(){
+  if (this.args != null){
+    if (this.args.length>1){
         isSimulation = true;
     }
     else{
     portName = args[0];
     }
   }
-  if (isSimulation){
-    println("Simulation!");
-  }
-  else{
-    println("Communication on port: " + portName);
-    machinePort = new Serial(this, portName, 115200);
-  }
+}
+  
+void setup(){
   size(1800,300); // config.windowWidth, config.windowHeight MUST be the same numbers !!!!
   background(0);
-
   config = new Config();
-  initApp();
+  checkCLArgs();
   if (isSimulation){
-    frameRate(config.speed);
+    setupSimulation();
   }
-  else{ // full speed!
-    frameRate(1000);// config.speed);  // nb frames or steps per second
-  }
-}
-
-void initApp(){
-  if (isSimulation){
-    bM     = new BlockingMgr(config);
-  }
-  else{  // not sim so create the comms manager
-    q = new LinkedBlockingQueue<Integer>();
-    cm = new CommsMgr(q);
+  else{
+    setupVisu();
   }
   sM     = new SimuMgr(bM,config);
   app    = new App(config, bM, sM, cm);
 }
+
 
 void draw(){
   background(0);

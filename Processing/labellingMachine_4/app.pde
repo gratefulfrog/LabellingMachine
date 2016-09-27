@@ -11,7 +11,6 @@ class SimuMgr{
   
   Boolean CALLOUTtags   = false,
           CALLOUTlabels = false,
-          showSync      = false,
           showBlocking  = false,
           stopAtMessage = false;
   
@@ -50,11 +49,9 @@ class SimuMgr{
     if (isSimulation){
       for (int i = 0; i< nbTags;i++){
         tVec.add(new Sticker(config,1,true,-(tagDelay +config.Tsteps)*(i+1) + ( i==0 ? 0 : -1)*round(random(-config.ITesteps,config.ITesteps))));
-        //tVec.get(i).nbSteps = -(tagDelay +config.Tsteps)*(i+1) + ( i==0 ? 0 : -1)*round(random(-config.ITesteps,config.ITesteps));  
       }
       for (int i = 0; i< nbLabels;i++){
         lVec.add(new Sticker(config,2,false, -(labelDelay+config.Lsteps) *(i+1) + ( i==0 ? 0 : -1)*round(random(-config.ILLesteps,config.ILLesteps)))); 
-        //lVec.get(i).nbSteps = -(labelDelay+config.Lsteps) *(i+1) + ( i==0 ? 0 : -1)*round(random(-config.ILLesteps,config.ILLesteps));
       }
     }
     
@@ -100,18 +97,14 @@ class SimuMgr{
   Sticker updateTag(Sticker t){  
     // only called in simulation 
     if ((t.support == 3) && (t.nbSteps > tagEndStep)) { 
-      //t = new Sticker(config,1,true); 
-      //t.nbSteps = minTSteps - (tagDelay+config.Tsteps) - round(random(-config.ITesteps,config.ITesteps));
-      t = new Sticker(config,1,true,(minTSteps - (tagDelay+config.Tsteps) - round(random(-config.ITesteps,config.ITesteps))));
+     t = new Sticker(config,1,true,(minTSteps - (tagDelay+config.Tsteps) - round(random(-config.ITesteps,config.ITesteps))));
     }
     return t;
   }
   
   Sticker updateLabel(Sticker l){
      if ((l.support == 3) && (l.nbSteps > labelEndStep)) { 
-      //l = new Sticker(config,2,false);
-      //l.nbSteps = minLSteps- (labelDelay+config.Lsteps) - round(random(-config.ILLesteps,config.ILLesteps)); //+round(random(-config.ILLesteps,config.ILLesteps)));
-      l = new Sticker(config,2,false, (minLSteps- (labelDelay+config.Lsteps) - round(random(-config.ILLesteps,config.ILLesteps))));
+     l = new Sticker(config,2,false, (minLSteps- (labelDelay+config.Lsteps) - round(random(-config.ILLesteps,config.ILLesteps))));
      }
     return l;
   }
@@ -225,8 +218,9 @@ class SimuMgr{
   }
   void keyPressed(){
     if (isSimulation){
-      visuKeyPressed();
-      simuKeyPressed();
+      if (!visuKeyPressed()){
+        simuKeyPressed();
+      }
     }
   }    
 }
@@ -279,19 +273,11 @@ class App{
   
   void updateMachineState(){
     int curr = cMgr.interpretIncomingByte();
-    /*
-    if (curr !=0){
-      print(boolean((curr>>5) & 1) ? "New Tag ": "");
-      print(boolean((curr>>4) & 1) ? "NewLabel " :  "");
-      print(boolean((curr>>3) & 1) ? "Cleared " : "");
-      print(boolean((curr>>2) & 1) ? "Tagger Step " : "");
-      print(boolean((curr>>1) & 1) ? "Labeller Step " :"");
-      println(boolean(curr & 1) ? "Backer Step" : "");
-    }
-    */
+
     backer.stepOK   = boolean(curr & (1<<0));
     labeller.stepOK = boolean(curr & (1<<1));
     tagger.stepOK   = boolean(curr & (1<<2));
+    
     if (boolean(curr & (1<<3))){
       clearLastLTPair();
     }
