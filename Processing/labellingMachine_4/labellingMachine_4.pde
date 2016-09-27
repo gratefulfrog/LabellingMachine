@@ -13,9 +13,7 @@ String portName = "/dev/ttyACM0";
 Serial machinePort;
 
 // testing and simulation
-boolean isSimulation =  true; //false;
-boolean testing = false;
-
+boolean isSimulation;  //= false;
 
 void setupSimulation(){
   println("Simulation!");
@@ -33,13 +31,12 @@ void setupVisu(){
 }
 
 void checkCLArgs(){
-  if (this.args != null){
-    if (this.args.length>1){
-        isSimulation = true;
-    }
-    else{
-    portName = args[0];
-    }
+  if ((this.args == null) || (this.args.length>1)){
+    isSimulation = true;
+  }
+  else {
+    isSimulation = false;  
+    portName     = args[0];
   }
 }
   

@@ -102,7 +102,7 @@ class Config{
             baseHeight          = 50,
             rampHeight          = round(RH * mm2Pixels),
             rampBaseLength      = round(106 * mm2Pixels),
-            rampSlopeLength     = round(150 * mm2Pixels),
+            rampSlopeLength     = round(210 * mm2Pixels),
             tagBaseLeftOffset   = round(50 * mm2Pixels),
             labelBaseLeftOffset = round(350 * mm2Pixels),
             baseX               = round((windowWidth - baseLength)/2.0),

@@ -11,19 +11,17 @@ class Platform {
     labelRamp =  new SteppingLine(conf.rampSlopeLength,conf.platformColor,0,conf.steps2Pixels);
   }
   
-  void drawRamp(SteppingLine l){
+  void drawRamp(SteppingLine l,int lineWeight){
+    strokeWeight(lineWeight);
     stroke(conf.platformColor);
-    // baseline
-    //line(0,0,
-    //     conf.rampBaseLength,0);
-    
-    // slope
     pushMatrix();
     translate(conf.rampBaseLength,0);
     rotate(conf.RAdegrees*PI/180.0 );
     translate(-conf.rampSlopeLength,0);
     l.draw();
     popMatrix();
+    strokeWeight(1);  
+
   }
   
   void drawRampMarkers(boolean isLabeller){
@@ -160,12 +158,12 @@ class Platform {
     popMatrix();
     pushMatrix();
     translate(conf.baseX+conf.tagBaseLeftOffset,conf.baseY-conf.rampHeight);
-    drawRamp(tagRamp);
+    drawRamp(tagRamp,2);
     drawRampMarkers(false);
     popMatrix();
     pushMatrix();
     translate(conf.baseX+conf.labelBaseLeftOffset,conf.baseY-conf.rampHeight);
-    drawRamp(labelRamp);
+    drawRamp(labelRamp,3);
     drawRampMarkers(true);
     popMatrix();
   }
