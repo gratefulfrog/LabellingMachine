@@ -48,9 +48,9 @@ class HWConfig{
                      labelDetectorPin = B_LD_PIN,
                      highDelay   = 50,  // microseconds
                      lowDelay    = 50;  // microseconds
-    static const int visualizationDelay; // = max(0,round(5-(0.001*highDelay))); // milliseconds not low delay because this is not needed! + lowDelay);            
+    static const int visualizationDelay; 
 
-    static const long labelDetectorPause, // = Config::Lsteps + round(0.5*Config::ILLsteps),
-                      tagDetectorPause; //  = Config::Tsteps + round(0.5*Config::ITsteps);
+    static const long labelDetectorPause,
+                      tagDetectorPause; 
 };
 #endif
