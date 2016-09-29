@@ -21,8 +21,8 @@ class App{
                    *tDeq;
     
     Driver *tagger,
-             *labeller,
-             *backer;
+           *labeller,
+           *backer;
     
     byte outgoing = 0;
     unsigned long counter =0;
