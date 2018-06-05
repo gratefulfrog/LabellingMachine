@@ -1,4 +1,7 @@
 # The Great Labelling Machine
+
+Following Microsoft's purchase of Github, this project has migrated to gitlab.
+
 This repo contains code for:
 * The GLM Simulator/Visualization:
  * The same code can either simulate the full physical machine or simply receive and 
